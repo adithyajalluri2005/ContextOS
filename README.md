@@ -20,6 +20,23 @@ contextos pack <id> --out context.md     # paste this into your next chat
 
 Later: an MCP server so AI tools can fetch packs themselves, a browser extension, and team sharing.
 
+## Importing chats
+
+### ChatGPT (works now)
+
+1. In ChatGPT, open **Settings → Data controls → Export data** and confirm.
+2. You get an email with a download link. Download the ZIP file.
+3. Run:
+
+   ```
+   contextos import chatgpt path/to/export.zip
+   ```
+
+You can also pass the unzipped folder or `conversations.json`. Running it again later
+only adds new chats and updates changed ones. When you edited a message or asked for a
+new answer, only the version you ended on is kept. Images become `[image]`, and long
+code-tool output is shortened.
+
 ## The Context Pack format
 
 A pack is plain JSON with a title, summary, decisions, open questions, next steps, key facts,

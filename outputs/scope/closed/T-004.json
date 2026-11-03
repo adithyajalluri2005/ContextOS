@@ -1,0 +1,28 @@
+{
+  "task_id": "T-004",
+  "goal": "Build an importer for the official ChatGPT data export ZIP (conversations.json) in contextos/importers/chatgpt.py. Follow the branching message tree and keep only the branch the user ended on. Add a small made-up test export in tests/fixtures/.",
+  "allowed_files": [
+    "contextos/importers/**",
+    "contextos/cli.py",
+    "tests/test_import_chatgpt.py",
+    "tests/fixtures/**",
+    "README.md",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [
+    ".env",
+    "scripts/**",
+    "docs/**",
+    "schemas/**",
+    "pyproject.toml",
+    "contextos/pack/**",
+    "contextos/store.py"
+  ],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_import_chatgpt.py",
+    "contextos import chatgpt tests/fixtures/chatgpt_export.zip"
+  ],
+  "rollback_plan": "Delete contextos/importers/, tests/test_import_chatgpt.py and tests/fixtures/chatgpt*; remove the import command group from contextos/cli.py.",
+  "approvals_required": []
+}

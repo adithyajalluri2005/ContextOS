@@ -2,19 +2,25 @@
   "schema_version": 1,
   "active_task_id": null,
   "touched_files": [
-    "contextos/store.py",
-    "tests/test_store.py",
-    "tests/conftest.py",
+    "contextos/importers/__init__.py",
+    "contextos/importers/base.py",
+    "contextos/importers/chatgpt.py",
+    "contextos/cli.py",
+    "tests/test_import_chatgpt.py",
+    "tests/fixtures/make_fixtures.py",
+    "tests/fixtures/chatgpt_export.zip",
     "README.md",
     "task_board.json",
     "agent_state.json"
   ],
   "assumptions": [
-    "A conversation is identified by (source_tool, source_id). Re-importing replaces its messages only if the content fingerprint changed.",
-    "Importers pass messages as contextos.pack.Message, so stored messages and pack transcripts share one type.",
-    "Dates are stored as UTC ISO text. Schema version is kept in SQLite's user_version; newer databases are refused.",
-    "tests/conftest.py points CONTEXTOS_HOME at a temporary folder for every test."
+    "ChatGPT export format based on known exports: conversations.json (or conversations-NNN.json) with a mapping tree and current_node. Not yet tested against a real 2026 export.",
+    "Kept content types: text, multimodal_text (images -> [image]), code (fenced), execution_output, tether_quote, tether_browsing_display, system_error. Thoughts, reasoning recaps, custom instructions and memory are left out.",
+    "Tool output is cut to 4000 characters.",
+    "Chats with no visible messages are skipped and reported, not stored.",
+    "Run the acceptance import command with CONTEXTOS_HOME set to a temporary folder, so made-up chats do not enter the real database.",
+    "New importers follow the same shape: read_export(path) -> ParsedExport, plus a command under `contextos import`."
   ],
   "blockers": [],
-  "next_action": "write outputs/scope/closed/T-004.json, then start T-004 (ChatGPT export importer, using Store.save)"
+  "next_action": "ask the human to test `contextos import chatgpt` with their real export; then write outputs/scope/closed/T-005.json and start T-005 (Claude.ai importer)"
 }

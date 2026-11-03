@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from pathlib import Path
 from typing import Annotated, Optional
 
 import typer
 
 from contextos import __version__
+from contextos.importers import ImportFailed, ImportResult, ParsedExport, save_all
 from contextos.pack import json_schema
+from contextos.store import Store
 
 app = typer.Typer(
     name="contextos",
@@ -17,6 +20,10 @@ app = typer.Typer(
     no_args_is_help=True,
     add_completion=False,
 )
+import_app = typer.Typer(help="Import conversations from an AI tool.", no_args_is_help=True)
+app.add_typer(import_app, name="import")
+
+MAX_SKIP_LINES = 5
 
 
 def _version_callback(value: bool) -> None:
@@ -58,3 +65,43 @@ def schema(
     with out.open("w", encoding="utf-8", newline="\n") as fh:
         fh.write(text)
     typer.echo(f"Wrote {out}")
+
+
+# --- import ------------------------------------------------------------------
+
+
+def _report(tool_name: str, result: ImportResult, store: Store) -> None:
+    typer.echo(
+        f"Imported {result.total} conversation(s) from {tool_name}: "
+        f"{result.created} new, {result.updated} updated, {result.unchanged} unchanged."
+    )
+    if result.skipped:
+        typer.echo(f"Skipped {len(result.skipped)}:")
+        for reason in result.skipped[:MAX_SKIP_LINES]:
+            typer.echo(f"  - {reason}")
+        if len(result.skipped) > MAX_SKIP_LINES:
+            typer.echo(f"  ... and {len(result.skipped) - MAX_SKIP_LINES} more")
+    typer.echo(f"Saved in {store.path}")
+
+
+def _run_import(tool_name: str, read: Callable[[], ParsedExport]) -> None:
+    try:
+        parsed = read()
+    except ImportFailed as exc:
+        typer.echo(f"Error: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+    with Store() as store:
+        _report(tool_name, save_all(parsed, store), store)
+
+
+@import_app.command("chatgpt")
+def import_chatgpt(
+    path: Annotated[
+        Path,
+        typer.Argument(help="The ChatGPT export ZIP, the unzipped folder, or conversations.json."),
+    ],
+) -> None:
+    """Import an official ChatGPT data export (Settings → Data controls → Export data)."""
+    from contextos.importers import chatgpt
+
+    _run_import("ChatGPT", lambda: chatgpt.read_export(path))

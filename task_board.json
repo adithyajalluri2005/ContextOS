@@ -37,7 +37,7 @@
       "python -m pytest tests/test_import_chatgpt.py",
       "contextos import chatgpt tests/fixtures/chatgpt_export.zip"
     ],
-    "status": "todo"
+    "status": "done"
   },
   {
     "id": "T-005",
