@@ -2,26 +2,25 @@
   "schema_version": 1,
   "active_task_id": null,
   "touched_files": [
-    "contextos/importers/base.py",
-    "contextos/importers/chatgpt.py",
-    "contextos/importers/claude_ai.py",
+    "contextos/importers/claude_code.py",
     "contextos/cli.py",
-    "tests/test_import_claude_ai.py",
+    "tests/test_import_claude_code.py",
     "tests/fixtures/make_fixtures.py",
-    "tests/fixtures/claude_export.zip",
+    "tests/fixtures/claude_code/",
     "README.md",
     "task_board.json",
     "agent_state.json"
   ],
   "assumptions": [
-    "Claude.ai export format based on known exports: conversations.json with uuid, name, chat_messages (sender, text, content blocks, attachments, files, optional parent_message_uuid). Not yet tested against a real 2026 export.",
-    "With parent links, the branch ending at the newest message is kept. Without them, list order is used.",
-    "Kept: text blocks, tool_use as [used tool: name], attachment extracted_content (cut to 4000 chars), file names. Left out: thinking, tool_result, users.json, projects.json.",
-    "Dates without a time zone are taken as UTC.",
-    "Shared loader, cut(), parse_epoch(), parse_iso() and run_parser() now live in contextos/importers/base.py; the ChatGPT importer uses them too."
+    "Format checked against 42 real local sessions (structure only, no content read): line types user/assistant/attachment/system carry uuid+parentUuid; titles come from custom-title and ai-title lines; compaction uses a system compact_boundary line with logicalParentUuid.",
+    "Every line with a uuid is a chain link (attachment lines are parents of ~3400 messages). Branch = chain ending at the last user/assistant line in the file.",
+    "Known limit: parallel tool calls branch the chain, so a few tool_use lines (~26 of ~5000 in real data) are missed. No user or assistant text is lost.",
+    "Hidden: isMeta, isCompactSummary, isApiErrorMessage, isSidechain, tool_result, thinking, and user text starting with task-notification / local-command / system-reminder / bash output tags. Slash commands become [command: /name args].",
+    "First message is a system note with the working folder and git branch. Back-to-back assistant lines are joined into one message; a compaction note keeps turns apart.",
+    "Session id comes from sessionId (falls back to the file name). url is None."
   ],
   "blockers": [
-    "Real ChatGPT and Claude exports not yet tested; the human has requested the ChatGPT export (2026-11-03) and is waiting for the email."
+    "Real ChatGPT and Claude.ai exports not yet tested; the human is waiting for the export emails."
   ],
-  "next_action": "write outputs/scope/closed/T-006.json, then start T-006 (Claude Code transcript importer)"
+  "next_action": "write outputs/scope/closed/T-007.json, then start T-007 (contextos list and show)"
 }

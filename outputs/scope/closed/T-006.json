@@ -1,0 +1,28 @@
+{
+  "task_id": "T-006",
+  "goal": "Build an importer for Claude Code session transcripts (the JSONL files in ~/.claude/projects/) in contextos/importers/claude_code.py. Keep user and assistant messages, and the names of tool calls, but drop large tool outputs. Add a --path option so tests can point it at a test folder.",
+  "allowed_files": [
+    "contextos/importers/**",
+    "contextos/cli.py",
+    "tests/test_import_claude_code.py",
+    "tests/fixtures/**",
+    "README.md",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [
+    ".env",
+    "scripts/**",
+    "docs/**",
+    "schemas/**",
+    "pyproject.toml",
+    "contextos/pack/**",
+    "contextos/store.py"
+  ],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_import_claude_code.py",
+    "contextos import claude-code --path tests/fixtures/claude_code"
+  ],
+  "rollback_plan": "Delete contextos/importers/claude_code.py, tests/test_import_claude_code.py and tests/fixtures/claude_code/; revert the claude-code command in contextos/cli.py and the Claude Code part of tests/fixtures/make_fixtures.py.",
+  "approvals_required": []
+}

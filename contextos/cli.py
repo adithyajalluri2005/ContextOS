@@ -118,3 +118,20 @@ def import_claude_ai(
     from contextos.importers import claude_ai
 
     _run_import("Claude.ai", lambda: claude_ai.read_export(path))
+
+
+@import_app.command("claude-code")
+def import_claude_code(
+    path: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--path",
+            "-p",
+            help="Projects folder, one project folder, or one .jsonl file. Default: ~/.claude/projects",
+        ),
+    ] = None,
+) -> None:
+    """Import Claude Code sessions saved on this computer."""
+    from contextos.importers import claude_code
+
+    _run_import("Claude Code", lambda: claude_code.read_sessions(path))

@@ -51,6 +51,24 @@ The same rules apply: running it again does not make copies, and only the branch
 ended on is kept. Text from attached files is kept (shortened if very long). Claude's
 hidden thinking and raw tool results are left out; a tool call shows as `[used tool: name]`.
 
+### Claude Code (works now)
+
+Claude Code already saves every session on your computer, so there is nothing to export:
+
+```
+contextos import claude-code                       # all sessions in ~/.claude/projects
+contextos import claude-code --path <folder|file>  # one project folder or one .jsonl file
+```
+
+Each session keeps your prompts, Claude's answers, the working folder and git branch,
+and one short line per tool call, such as `[ran: pytest -q]` or `[edited file: app.py]`.
+Tool output, hidden thinking, helper-agent messages and status messages are left out.
+If you rewound a session, only the branch you ended on is kept. If it was compacted, the
+full history is kept, with a note where compaction happened.
+
+Known limit: when Claude runs several tools at once, a few of those tool lines can be
+missing. Your prompts and Claude's answers are never lost.
+
 ## The Context Pack format
 
 A pack is plain JSON with a title, summary, decisions, open questions, next steps, key facts,

@@ -57,7 +57,7 @@
       "python -m pytest tests/test_import_claude_code.py",
       "contextos import claude-code --path tests/fixtures/claude_code"
     ],
-    "status": "todo"
+    "status": "done"
   },
   {
     "id": "T-007",
