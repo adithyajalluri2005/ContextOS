@@ -1,0 +1,25 @@
+{
+  "task_id": "T-003",
+  "goal": "Add local storage using SQLite in contextos/store.py, with tables for conversations and messages. Each conversation records its source tool, title, created date and original ID. Running the same import twice must not create duplicates. The default database path is ~/.contextos/contextos.db, and the CONTEXTOS_HOME environment variable can change it.",
+  "allowed_files": [
+    "contextos/store.py",
+    "tests/test_store.py",
+    "tests/conftest.py",
+    "README.md",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [
+    ".env",
+    "scripts/**",
+    "docs/**",
+    "schemas/**",
+    "pyproject.toml",
+    "contextos/pack/**"
+  ],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_store.py"
+  ],
+  "rollback_plan": "Delete contextos/store.py, tests/test_store.py and tests/conftest.py.",
+  "approvals_required": []
+}

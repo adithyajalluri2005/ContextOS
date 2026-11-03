@@ -2,22 +2,19 @@
   "schema_version": 1,
   "active_task_id": null,
   "touched_files": [
-    "contextos/pack/__init__.py",
-    "contextos/pack/model.py",
-    "contextos/cli.py",
-    "tests/test_pack_model.py",
-    "SPEC.md",
-    "schemas/context-pack.schema.json",
+    "contextos/store.py",
+    "tests/test_store.py",
+    "tests/conftest.py",
     "README.md",
     "task_board.json",
     "agent_state.json"
   ],
   "assumptions": [
-    "Pack has a single `source` (one conversation per pack), as the task says. Merging several chats into one pack would need a format change.",
-    "Unknown fields are rejected (strict). Readers reject unknown spec versions before 1.0.",
-    "All dates must include a time zone.",
-    "key_facts, open_questions and next_steps are plain strings, not objects."
+    "A conversation is identified by (source_tool, source_id). Re-importing replaces its messages only if the content fingerprint changed.",
+    "Importers pass messages as contextos.pack.Message, so stored messages and pack transcripts share one type.",
+    "Dates are stored as UTC ISO text. Schema version is kept in SQLite's user_version; newer databases are refused.",
+    "tests/conftest.py points CONTEXTOS_HOME at a temporary folder for every test."
   ],
   "blockers": [],
-  "next_action": "write outputs/scope/closed/T-003.json, then start T-003 (SQLite store)"
+  "next_action": "write outputs/scope/closed/T-004.json, then start T-004 (ChatGPT export importer, using Store.save)"
 }

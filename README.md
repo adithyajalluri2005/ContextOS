@@ -27,6 +27,12 @@ code, file references and the source chat. Read the full description in [SPEC.md
 The schema is in [`schemas/context-pack.schema.json`](schemas/context-pack.schema.json);
 `contextos schema` prints it.
 
+## Where your data lives
+
+Imported chats are stored only on your computer, in a SQLite file at
+`~/.contextos/contextos.db`. Set the `CONTEXTOS_HOME` environment variable to use a
+different folder. Nothing is uploaded anywhere.
+
 ## Development setup
 
 Needs Python 3.12 or newer.

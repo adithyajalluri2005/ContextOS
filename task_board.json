@@ -27,7 +27,7 @@
     "acceptance": [
       "python -m pytest tests/test_store.py"
     ],
-    "status": "todo"
+    "status": "done"
   },
   {
     "id": "T-004",
