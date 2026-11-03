@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
 import time
 from pathlib import Path
@@ -27,7 +28,10 @@ def run_with_feedback(command: list[str], agent_note: str = "", timeout_s: float
     started = time.time()
     record: dict[str, object] = {"command": command, "agent_note": agent_note, "started_at": started}
     try:
-        completed = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout_s)
+        # Look the program up in PATH ourselves. On Windows, CreateProcess searches the
+        # parent's own folder first, so a bare "python" would bypass an activated venv.
+        resolved = [shutil.which(command[0]) or command[0], *command[1:]]
+        completed = subprocess.run(resolved, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout_s)
         out, cut_out = deterministic_tail(completed.stdout)
         err, cut_err = deterministic_tail(completed.stderr)
         record.update(
