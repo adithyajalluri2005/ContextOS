@@ -1,0 +1,35 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local ContextOS data (never commit real chats)
+.contextos/
+*.db
+
+# Tooling / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+
+# Agent workbench runtime output (tracked: AGENTS.md, docs/, schemas/, scripts/, task_board.json, outputs/scope/)
+init_report.json
+feedback_record.jsonl
+outputs/verification/
+outputs/handoff/
+outputs/rule_report.json

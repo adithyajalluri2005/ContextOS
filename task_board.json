@@ -1,0 +1,118 @@
+[
+  {
+    "id": "T-001",
+    "goal": "Set up the new project: a pyproject.toml, a contextos/ Python package, a Typer command-line entry point named `contextos` with a --version flag, a tests/ folder, and a GitHub Actions CI file that runs the tests.",
+    "owner": "builder",
+    "acceptance": [
+      "pip install -e .[dev]",
+      "contextos --version",
+      "python -m pytest tests"
+    ],
+    "status": "todo"
+  },
+  {
+    "id": "T-002",
+    "goal": "Define the Context Pack format as Pydantic models in contextos/pack/model.py. Fields: summary, decisions (with reasons), open_questions, next_steps, key_facts, code_snippets, file_refs, source (tool, date, link), and an optional raw_transcript. Add a `contextos schema` command that writes the JSON schema to a file. Write SPEC.md to describe the format.",
+    "owner": "builder",
+    "acceptance": [
+      "python -m pytest tests/test_pack_model.py",
+      "contextos schema --out schemas/context-pack.schema.json"
+    ],
+    "status": "todo"
+  },
+  {
+    "id": "T-003",
+    "goal": "Add local storage using SQLite in contextos/store.py, with tables for conversations and messages. Each conversation records its source tool, title, created date and original ID. Running the same import twice must not create duplicates. The default database path is ~/.contextos/contextos.db, and the CONTEXTOS_HOME environment variable can change it.",
+    "owner": "builder",
+    "acceptance": [
+      "python -m pytest tests/test_store.py"
+    ],
+    "status": "todo"
+  },
+  {
+    "id": "T-004",
+    "goal": "Build an importer for the official ChatGPT data export ZIP (conversations.json) in contextos/importers/chatgpt.py. Follow the branching message tree and keep only the branch the user ended on. Add a small made-up test export in tests/fixtures/.",
+    "owner": "builder",
+    "acceptance": [
+      "python -m pytest tests/test_import_chatgpt.py",
+      "contextos import chatgpt tests/fixtures/chatgpt_export.zip"
+    ],
+    "status": "todo"
+  },
+  {
+    "id": "T-005",
+    "goal": "Build an importer for the official Claude.ai data export (conversations.json) in contextos/importers/claude_ai.py. Add a small made-up test export in tests/fixtures/.",
+    "owner": "builder",
+    "acceptance": [
+      "python -m pytest tests/test_import_claude_ai.py",
+      "contextos import claude-ai tests/fixtures/claude_export.zip"
+    ],
+    "status": "todo"
+  },
+  {
+    "id": "T-006",
+    "goal": "Build an importer for Claude Code session transcripts (the JSONL files in ~/.claude/projects/) in contextos/importers/claude_code.py. Keep user and assistant messages, and the names of tool calls, but drop large tool outputs. Add a --path option so tests can point it at a test folder.",
+    "owner": "builder",
+    "acceptance": [
+      "python -m pytest tests/test_import_claude_code.py",
+      "contextos import claude-code --path tests/fixtures/claude_code"
+    ],
+    "status": "todo"
+  },
+  {
+    "id": "T-007",
+    "goal": "Add `contextos list` (shows imported conversations: ID, source, title, date, message count; can filter with --source) and `contextos show <id>` (prints the conversation).",
+    "owner": "builder",
+    "acceptance": [
+      "python -m pytest tests/test_cli_list_show.py"
+    ],
+    "status": "todo"
+  },
+  {
+    "id": "T-008",
+    "goal": "Add a model provider layer in contextos/llm/: one shared interface, with Anthropic, OpenAI and Ollama providers plus a FakeProvider for tests. Pick the provider with CONTEXTOS_PROVIDER, and read keys only from environment variables. Build the pack builder that turns a conversation into a Context Pack. Long chats are summarized in pieces, and those summaries are then combined.",
+    "owner": "builder",
+    "acceptance": [
+      "python -m pytest tests/test_pack_builder.py"
+    ],
+    "status": "todo"
+  },
+  {
+    "id": "T-009",
+    "goal": "Add `contextos pack <id> --out context.md`, which builds a pack and writes it as Markdown ready to paste into a new chat. Also add --format json and --format claude-md (writes a section that can go into CLAUDE.md or AGENTS.md).",
+    "owner": "builder",
+    "acceptance": [
+      "python -m pytest tests/test_pack_render.py",
+      "python -m pytest tests/test_cli_pack.py"
+    ],
+    "status": "todo"
+  },
+  {
+    "id": "T-010",
+    "goal": "Hide secrets before any pack is written: API keys (OpenAI, Anthropic, AWS, GitHub), private keys, passwords in URLs, emails and phone numbers. Hiding is on by default; --no-redact turns it off and shows a warning. The pack lists how many items were hidden, but never the items themselves.",
+    "owner": "builder",
+    "acceptance": [
+      "python -m pytest tests/test_redact.py"
+    ],
+    "status": "todo"
+  },
+  {
+    "id": "T-011",
+    "goal": "Add a full test of the whole flow: import the ChatGPT test export, run pack with FakeProvider, and check the Markdown output. Rewrite README.md around this 30-second demo. Add CONTRIBUTING.md with a short guide called 'How to add a new importer'.",
+    "owner": "builder",
+    "acceptance": [
+      "python -m pytest tests/test_end_to_end.py",
+      "python -m pytest tests"
+    ],
+    "status": "todo"
+  },
+  {
+    "id": "T-012",
+    "goal": "Stage 2: Add an MCP server (`contextos mcp`, using stdio) with the tools list_conversations, get_context_pack(id) and search(query). It must use the same store and pack builder as the command-line tool. Test it with a real MCP SDK client.",
+    "owner": "builder",
+    "acceptance": [
+      "python -m pytest tests/test_mcp_server.py"
+    ],
+    "status": "todo"
+  }
+]

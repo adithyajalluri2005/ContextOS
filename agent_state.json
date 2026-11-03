@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "active_task_id": null,
+  "touched_files": [],
+  "assumptions": [],
+  "blockers": [],
+  "next_action": "read AGENTS.md, run scripts/init_agent.py, then start T-001 from task_board.json"
+}
