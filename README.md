@@ -20,6 +20,18 @@ contextos pack <id> --out context.md     # paste this into your next chat
 
 Later: an MCP server so AI tools can fetch packs themselves, a browser extension, and team sharing.
 
+## Development setup
+
+Needs Python 3.12 or newer.
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1      # macOS/Linux: source .venv/bin/activate
+pip install -e ".[dev]"
+contextos --version
+python -m pytest tests
+```
+
 ## License
 
 MIT

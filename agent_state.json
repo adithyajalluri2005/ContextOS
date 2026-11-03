@@ -1,8 +1,21 @@
 {
   "schema_version": 1,
   "active_task_id": null,
-  "touched_files": [],
-  "assumptions": [],
+  "touched_files": [
+    "pyproject.toml",
+    "contextos/__init__.py",
+    "contextos/__main__.py",
+    "contextos/cli.py",
+    "tests/test_cli.py",
+    ".github/workflows/ci.yml",
+    "README.md",
+    "task_board.json",
+    "agent_state.json"
+  ],
+  "assumptions": [
+    "Human approved typer and pydantic as runtime dependencies in the planning chat on 2026-11-03.",
+    "Build backend is hatchling; version is read from contextos/__init__.py."
+  ],
   "blockers": [],
-  "next_action": "read AGENTS.md, run scripts/init_agent.py, then start T-001 from task_board.json"
+  "next_action": "write outputs/scope/closed/T-002.json, add typer and pydantic to REQUIRED_DEPS in scripts/init_agent.py, then start T-002"
 }

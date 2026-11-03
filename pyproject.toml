@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "contextos"
+dynamic = ["version"]
+description = "Move AI conversations between tools, accounts and teammates as portable Context Packs."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+authors = [{ name = "ContextOS contributors" }]
+keywords = ["llm", "context", "chatgpt", "claude", "mcp", "ai-agents"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Environment :: Console",
+]
+dependencies = [
+  "typer>=0.12",
+  "pydantic>=2.7",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+]
+
+[project.scripts]
+contextos = "contextos.cli:app"
+
+[tool.hatch.version]
+path = "contextos/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["contextos"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

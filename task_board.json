@@ -8,7 +8,7 @@
       "contextos --version",
       "python -m pytest tests"
     ],
-    "status": "todo"
+    "status": "done"
   },
   {
     "id": "T-002",
