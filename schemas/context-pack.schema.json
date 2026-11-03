@@ -1,0 +1,343 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "context-pack.schema.json",
+  "$defs": {
+    "CodeSnippet": {
+      "additionalProperties": false,
+      "description": "A piece of code worth carrying over.",
+      "properties": {
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Language name, e.g. \"python\".",
+          "title": "Language"
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "File the code belongs to, if known.",
+          "title": "Path"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "What the code does or why it matters.",
+          "title": "Description"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "CodeSnippet",
+      "type": "object"
+    },
+    "Decision": {
+      "additionalProperties": false,
+      "description": "Something that was decided, and why.",
+      "properties": {
+        "decision": {
+          "description": "What was decided.",
+          "minLength": 1,
+          "title": "Decision",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Why it was decided.",
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "decision"
+      ],
+      "title": "Decision",
+      "type": "object"
+    },
+    "FileRef": {
+      "additionalProperties": false,
+      "description": "A file that the conversation talked about.",
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Why the file matters.",
+          "title": "Description"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "title": "FileRef",
+      "type": "object"
+    },
+    "Message": {
+      "additionalProperties": false,
+      "description": "One message of the original conversation, used only in raw_transcript.",
+      "properties": {
+        "role": {
+          "enum": [
+            "user",
+            "assistant",
+            "system",
+            "tool"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "content": {
+          "title": "Content",
+          "type": "string"
+        },
+        "created_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Created At"
+        }
+      },
+      "required": [
+        "role",
+        "content"
+      ],
+      "title": "Message",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "description": "Where the conversation came from.",
+      "properties": {
+        "tool": {
+          "description": "Tool the conversation was taken from, e.g. \"chatgpt\", \"claude-ai\", \"claude-code\".",
+          "minLength": 1,
+          "title": "Tool",
+          "type": "string"
+        },
+        "conversation_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ID of the conversation in the original tool.",
+          "title": "Conversation Id"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Title of the original conversation.",
+          "title": "Title"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Link to the original conversation, if there is one.",
+          "title": "Url"
+        },
+        "created_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "When the conversation started.",
+          "title": "Created At"
+        },
+        "updated_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "When the conversation last changed.",
+          "title": "Updated At"
+        }
+      },
+      "required": [
+        "tool"
+      ],
+      "title": "Source",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A portable summary of one AI conversation.",
+  "properties": {
+    "spec_version": {
+      "const": "0.1",
+      "default": "0.1",
+      "description": "Version of this format.",
+      "title": "Spec Version",
+      "type": "string"
+    },
+    "title": {
+      "description": "Short name for what the conversation is about.",
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "summary": {
+      "description": "A few sentences a new reader needs first.",
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+    },
+    "decisions": {
+      "items": {
+        "$ref": "#/$defs/Decision"
+      },
+      "title": "Decisions",
+      "type": "array"
+    },
+    "open_questions": {
+      "description": "Questions not yet answered.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Open Questions",
+      "type": "array"
+    },
+    "next_steps": {
+      "description": "Concrete things to do next.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Next Steps",
+      "type": "array"
+    },
+    "key_facts": {
+      "description": "Facts to keep: names, versions, limits, numbers.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Key Facts",
+      "type": "array"
+    },
+    "code_snippets": {
+      "items": {
+        "$ref": "#/$defs/CodeSnippet"
+      },
+      "title": "Code Snippets",
+      "type": "array"
+    },
+    "file_refs": {
+      "items": {
+        "$ref": "#/$defs/FileRef"
+      },
+      "title": "File Refs",
+      "type": "array"
+    },
+    "source": {
+      "$ref": "#/$defs/Source"
+    },
+    "created_at": {
+      "description": "When this pack was made.",
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "raw_transcript": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/Message"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional full conversation. Leave out to keep the pack small.",
+      "title": "Raw Transcript"
+    }
+  },
+  "required": [
+    "title",
+    "summary",
+    "source"
+  ],
+  "title": "ContextPack",
+  "type": "object"
+}

@@ -2,20 +2,22 @@
   "schema_version": 1,
   "active_task_id": null,
   "touched_files": [
-    "pyproject.toml",
-    "contextos/__init__.py",
-    "contextos/__main__.py",
+    "contextos/pack/__init__.py",
+    "contextos/pack/model.py",
     "contextos/cli.py",
-    "tests/test_cli.py",
-    ".github/workflows/ci.yml",
+    "tests/test_pack_model.py",
+    "SPEC.md",
+    "schemas/context-pack.schema.json",
     "README.md",
     "task_board.json",
     "agent_state.json"
   ],
   "assumptions": [
-    "Human approved typer and pydantic as runtime dependencies in the planning chat on 2026-11-03.",
-    "Build backend is hatchling; version is read from contextos/__init__.py."
+    "Pack has a single `source` (one conversation per pack), as the task says. Merging several chats into one pack would need a format change.",
+    "Unknown fields are rejected (strict). Readers reject unknown spec versions before 1.0.",
+    "All dates must include a time zone.",
+    "key_facts, open_questions and next_steps are plain strings, not objects."
   ],
   "blockers": [],
-  "next_action": "write outputs/scope/closed/T-002.json, add typer and pydantic to REQUIRED_DEPS in scripts/init_agent.py, then start T-002"
+  "next_action": "write outputs/scope/closed/T-003.json, then start T-003 (SQLite store)"
 }

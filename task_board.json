@@ -18,7 +18,7 @@
       "python -m pytest tests/test_pack_model.py",
       "contextos schema --out schemas/context-pack.schema.json"
     ],
-    "status": "todo"
+    "status": "done"
   },
   {
     "id": "T-003",

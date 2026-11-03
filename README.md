@@ -20,6 +20,13 @@ contextos pack <id> --out context.md     # paste this into your next chat
 
 Later: an MCP server so AI tools can fetch packs themselves, a browser extension, and team sharing.
 
+## The Context Pack format
+
+A pack is plain JSON with a title, summary, decisions, open questions, next steps, key facts,
+code, file references and the source chat. Read the full description in [SPEC.md](SPEC.md).
+The schema is in [`schemas/context-pack.schema.json`](schemas/context-pack.schema.json);
+`contextos schema` prints it.
+
 ## Development setup
 
 Needs Python 3.12 or newer.
