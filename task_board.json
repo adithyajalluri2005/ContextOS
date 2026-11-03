@@ -47,7 +47,7 @@
       "python -m pytest tests/test_import_claude_ai.py",
       "contextos import claude-ai tests/fixtures/claude_export.zip"
     ],
-    "status": "todo"
+    "status": "done"
   },
   {
     "id": "T-006",

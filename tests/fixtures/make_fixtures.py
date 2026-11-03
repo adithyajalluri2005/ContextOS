@@ -136,13 +136,133 @@ def write_chatgpt_zip(path: Path = CHATGPT_ZIP) -> Path:
         "user.json": json.dumps({"id": "user-test", "email": "test@example.com"}),
         "chat.html": "<html><body>made-up export</body></html>",
     }
+    _write_zip(path, files)
+    return path
+
+
+# --- Claude.ai -------------------------------------------------------------
+
+CLAUDE_ZIP = HERE / "claude_export.zip"
+CLAUDE_ROOT = "00000000-0000-4000-8000-000000000000"
+LONG_ATTACHMENT = "Requirement line.\n" * 300  # 5400 characters, longer than the importer keeps
+
+
+def _cmsg(uuid, sender, when, *, parent=None, text="", content=None, attachments=None, files=None):
+    msg = {
+        "uuid": uuid,
+        "text": text,
+        "sender": sender,
+        "created_at": when,
+        "updated_at": when,
+        "attachments": attachments or [],
+        "files": files or [],
+    }
+    if content is not None:
+        msg["content"] = content
+    if parent is not None:
+        msg["parent_message_uuid"] = parent
+    return msg
+
+
+def _ctext(text):
+    return {"type": "text", "text": text, "start_timestamp": None, "stop_timestamp": None, "citations": []}
+
+
+def claude_conversations() -> list[dict]:
+    db_choice = {
+        "uuid": "11111111-aaaa-4000-8000-000000000001",
+        "name": "Database choice for ContextOS",
+        "created_at": "2026-11-01T10:00:00.000000Z",
+        "updated_at": "2026-11-01T10:05:00.000000Z",
+        "account": {"uuid": "acct-test"},
+        "chat_messages": [
+            _cmsg("m1", "human", "2026-11-01T10:00:00.000000Z", parent=CLAUDE_ROOT,
+                  text="Should I use SQLite or Postgres? Requirements attached.",
+                  content=[_ctext("Should I use SQLite or Postgres? Requirements attached.")],
+                  attachments=[{"file_name": "requirements.txt", "file_size": 5400,
+                                "file_type": "txt", "extracted_content": LONG_ATTACHMENT}],
+                  files=[{"file_name": "diagram.png"}]),
+            _cmsg("m2", "assistant", "2026-11-01T10:01:00.000000Z", parent="m1",
+                  text="Use SQLite for the local tool.",
+                  content=[
+                      {"type": "thinking", "thinking": "SECRET REASONING: weigh both options."},
+                      {"type": "tool_use", "name": "web_search", "input": {"query": "sqlite limits"}},
+                      {"type": "tool_result", "name": "web_search",
+                       "content": [{"type": "text", "text": "RAW SEARCH RESULT"}], "is_error": False},
+                      _ctext("Use SQLite for the local tool."),
+                      _ctext("Move to Postgres only for the team server."),
+                  ]),
+        ],
+    }
+
+    branched = {
+        "uuid": "22222222-bbbb-4000-8000-000000000002",
+        "name": "Name for the project",
+        "created_at": "2026-11-02T09:00:00Z",
+        "updated_at": "2026-11-02T09:10:00Z",
+        "chat_messages": [
+            _cmsg("b1", "human", "2026-11-02T09:00:00Z", parent=CLAUDE_ROOT, text="Suggest a name.",
+                  content=[_ctext("Suggest a name.")]),
+            _cmsg("b2", "assistant", "2026-11-02T09:01:00Z", parent="b1", text="ContextOS.",
+                  content=[_ctext("ContextOS.")]),
+            # Old branch: the user edited this message later, so it must NOT be imported.
+            _cmsg("b3", "human", "2026-11-02T09:02:00Z", parent="b2", text="Something shorter?",
+                  content=[_ctext("Something shorter?")]),
+            _cmsg("b4", "assistant", "2026-11-02T09:03:00Z", parent="b3", text="Ctx.",
+                  content=[_ctext("Ctx.")]),
+            # Branch the user ended on.
+            _cmsg("b5", "human", "2026-11-02T09:05:00Z", parent="b2", text="Something friendlier?",
+                  content=[_ctext("Something friendlier?")]),
+            _cmsg("b6", "assistant", "2026-11-02T09:06:00Z", parent="b5", text="Carry.",
+                  content=[_ctext("Carry.")]),
+        ],
+    }
+
+    # Older export style: no parent links, no content blocks, empty name, dates without time zone.
+    older = {
+        "uuid": "33333333-cccc-4000-8000-000000000003",
+        "name": "",
+        "created_at": "2026-10-20T08:00:00",
+        "updated_at": "2026-10-20T08:01:00",
+        "chat_messages": [
+            _cmsg("o1", "human", "2026-10-20T08:00:00", text="Hello"),
+            _cmsg("o2", "assistant", "2026-10-20T08:01:00", text="Hi! How can I help?"),
+        ],
+    }
+
+    empty = {
+        "uuid": "44444444-dddd-4000-8000-000000000004",
+        "name": "Empty chat",
+        "created_at": "2026-11-03T00:00:00Z",
+        "updated_at": "2026-11-03T00:00:00Z",
+        "chat_messages": [],
+    }
+
+    no_id = {"name": "Chat without id", "chat_messages": []}
+
+    return [db_choice, branched, older, empty, no_id]
+
+
+def write_claude_zip(path: Path = CLAUDE_ZIP) -> Path:
+    """Write a ZIP shaped like a real Claude export: conversations.json plus files to ignore."""
+    files = {
+        "conversations.json": json.dumps(claude_conversations(), indent=1),
+        "users.json": json.dumps([{"uuid": "acct-test", "full_name": "Test User",
+                                   "email_address": "test@example.com"}]),
+        "projects.json": json.dumps([{"uuid": "p1", "name": "Test project", "docs": []}]),
+    }
+    _write_zip(path, files)
+    return path
+
+
+def _write_zip(path: Path, files: dict[str, str]) -> None:
     with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         for name, text in files.items():
             info = zipfile.ZipInfo(name, date_time=_FIXED_ZIP_TIME)
             info.compress_type = zipfile.ZIP_DEFLATED
             zf.writestr(info, text)
-    return path
 
 
 if __name__ == "__main__":
     print(f"wrote {write_chatgpt_zip()}")
+    print(f"wrote {write_claude_zip()}")

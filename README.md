@@ -37,6 +37,20 @@ only adds new chats and updates changed ones. When you edited a message or asked
 new answer, only the version you ended on is kept. Images become `[image]`, and long
 code-tool output is shortened.
 
+### Claude.ai (works now)
+
+1. In Claude, open **Settings → Privacy → Export data**.
+2. You get an email with a download link. Download the ZIP file.
+3. Run:
+
+   ```
+   contextos import claude-ai path/to/export.zip
+   ```
+
+The same rules apply: running it again does not make copies, and only the branch you
+ended on is kept. Text from attached files is kept (shortened if very long). Claude's
+hidden thinking and raw tool results are left out; a tool call shows as `[used tool: name]`.
+
 ## The Context Pack format
 
 A pack is plain JSON with a title, summary, decisions, open questions, next steps, key facts,

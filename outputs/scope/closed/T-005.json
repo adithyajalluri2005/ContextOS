@@ -1,0 +1,28 @@
+{
+  "task_id": "T-005",
+  "goal": "Build an importer for the official Claude.ai data export (conversations.json) in contextos/importers/claude_ai.py. Add a small made-up test export in tests/fixtures/.",
+  "allowed_files": [
+    "contextos/importers/**",
+    "contextos/cli.py",
+    "tests/test_import_claude_ai.py",
+    "tests/fixtures/**",
+    "README.md",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [
+    ".env",
+    "scripts/**",
+    "docs/**",
+    "schemas/**",
+    "pyproject.toml",
+    "contextos/pack/**",
+    "contextos/store.py"
+  ],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_import_claude_ai.py",
+    "contextos import claude-ai tests/fixtures/claude_export.zip"
+  ],
+  "rollback_plan": "Delete contextos/importers/claude_ai.py, tests/test_import_claude_ai.py and tests/fixtures/claude_export.zip; revert the claude-ai command in contextos/cli.py, the shared loader in contextos/importers/base.py and chatgpt.py, and the Claude part of tests/fixtures/make_fixtures.py.",
+  "approvals_required": []
+}

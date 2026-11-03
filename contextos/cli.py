@@ -105,3 +105,16 @@ def import_chatgpt(
     from contextos.importers import chatgpt
 
     _run_import("ChatGPT", lambda: chatgpt.read_export(path))
+
+
+@import_app.command("claude-ai")
+def import_claude_ai(
+    path: Annotated[
+        Path,
+        typer.Argument(help="The Claude export ZIP, the unzipped folder, or conversations.json."),
+    ],
+) -> None:
+    """Import an official Claude.ai data export (Settings → Privacy → Export data)."""
+    from contextos.importers import claude_ai
+
+    _run_import("Claude.ai", lambda: claude_ai.read_export(path))

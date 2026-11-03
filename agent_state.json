@@ -2,25 +2,26 @@
   "schema_version": 1,
   "active_task_id": null,
   "touched_files": [
-    "contextos/importers/__init__.py",
     "contextos/importers/base.py",
     "contextos/importers/chatgpt.py",
+    "contextos/importers/claude_ai.py",
     "contextos/cli.py",
-    "tests/test_import_chatgpt.py",
+    "tests/test_import_claude_ai.py",
     "tests/fixtures/make_fixtures.py",
-    "tests/fixtures/chatgpt_export.zip",
+    "tests/fixtures/claude_export.zip",
     "README.md",
     "task_board.json",
     "agent_state.json"
   ],
   "assumptions": [
-    "ChatGPT export format based on known exports: conversations.json (or conversations-NNN.json) with a mapping tree and current_node. Not yet tested against a real 2026 export.",
-    "Kept content types: text, multimodal_text (images -> [image]), code (fenced), execution_output, tether_quote, tether_browsing_display, system_error. Thoughts, reasoning recaps, custom instructions and memory are left out.",
-    "Tool output is cut to 4000 characters.",
-    "Chats with no visible messages are skipped and reported, not stored.",
-    "Run the acceptance import command with CONTEXTOS_HOME set to a temporary folder, so made-up chats do not enter the real database.",
-    "New importers follow the same shape: read_export(path) -> ParsedExport, plus a command under `contextos import`."
+    "Claude.ai export format based on known exports: conversations.json with uuid, name, chat_messages (sender, text, content blocks, attachments, files, optional parent_message_uuid). Not yet tested against a real 2026 export.",
+    "With parent links, the branch ending at the newest message is kept. Without them, list order is used.",
+    "Kept: text blocks, tool_use as [used tool: name], attachment extracted_content (cut to 4000 chars), file names. Left out: thinking, tool_result, users.json, projects.json.",
+    "Dates without a time zone are taken as UTC.",
+    "Shared loader, cut(), parse_epoch(), parse_iso() and run_parser() now live in contextos/importers/base.py; the ChatGPT importer uses them too."
   ],
-  "blockers": [],
-  "next_action": "ask the human to test `contextos import chatgpt` with their real export; then write outputs/scope/closed/T-005.json and start T-005 (Claude.ai importer)"
+  "blockers": [
+    "Real ChatGPT and Claude exports not yet tested; the human has requested the ChatGPT export (2026-11-03) and is waiting for the email."
+  ],
+  "next_action": "write outputs/scope/closed/T-006.json, then start T-006 (Claude Code transcript importer)"
 }

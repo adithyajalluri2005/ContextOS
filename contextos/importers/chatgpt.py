@@ -12,80 +12,29 @@ The ZIP is read in memory. Nothing is extracted to disk.
 
 from __future__ import annotations
 
-import json
 import re
-import zipfile
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from pydantic import ValidationError
-
-from contextos.importers.base import ImportFailed, ParsedExport
+from contextos.importers.base import (
+    MAX_TOOL_CHARS,
+    ParsedExport,
+    cut,
+    load_json_lists,
+    run_parser,
+)
+from contextos.importers.base import parse_epoch as _timestamp
 from contextos.pack import Message
 from contextos.store import ConversationIn
 
+__all__ = ["MAX_TOOL_CHARS", "SOURCE_TOOL", "parse_conversation", "read_export"]
+
 SOURCE_TOOL = "chatgpt"
 CHAT_URL = "https://chatgpt.com/c/{id}"
-# Tool output (code results, web pages) can be huge. Keep the start, which is usually enough.
-MAX_TOOL_CHARS = 4000
 
 # conversations.json, or split files like conversations-000.json. Not shared_conversations.json.
 _CONV_FILE = re.compile(r"(?:^|/)conversations(?:-\d+)?\.json$")
 _ROLES = {"user", "assistant", "system", "tool"}
-
-
-# --- reading the files -----------------------------------------------------
-
-
-def _decode(raw: bytes, name: str) -> list[dict[str, Any]]:
-    try:
-        data = json.loads(raw.decode("utf-8-sig"))
-    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise ImportFailed(f"{name} is not valid JSON: {exc}") from exc
-    if not isinstance(data, list):
-        raise ImportFailed(f"{name} should contain a list of conversations.")
-    return data
-
-
-def load_raw_conversations(path: Path) -> list[dict[str, Any]]:
-    """Read every conversation from a ZIP, a folder, or a conversations.json file."""
-    if not path.exists():
-        raise ImportFailed(f"File not found: {path}")
-
-    if path.is_dir():
-        files = sorted(p for p in path.rglob("*.json") if _CONV_FILE.search(p.as_posix()))
-        if not files:
-            raise ImportFailed(f"No conversations.json found in folder {path}")
-        return [c for f in files for c in _decode(f.read_bytes(), f.name)]
-
-    if zipfile.is_zipfile(path):
-        with zipfile.ZipFile(path) as zf:
-            names = sorted(
-                n for n in zf.namelist() if _CONV_FILE.search(n) and not n.startswith("__MACOSX/")
-            )
-            if not names:
-                raise ImportFailed(
-                    f"{path.name} has no conversations.json. Is this a ChatGPT data export?"
-                )
-            return [c for n in names for c in _decode(zf.read(n), n)]
-
-    if path.suffix.lower() == ".json":
-        return _decode(path.read_bytes(), path.name)
-
-    raise ImportFailed(f"{path.name} is not a ZIP file or a .json file.")
-
-
-# --- one conversation ------------------------------------------------------
-
-
-def _timestamp(value: Any) -> datetime | None:
-    if not isinstance(value, (int, float)) or isinstance(value, bool) or value <= 0:
-        return None
-    try:
-        return datetime.fromtimestamp(value, tz=timezone.utc)
-    except (OverflowError, OSError, ValueError):
-        return None
 
 
 def _branch(mapping: dict[str, Any], current_node: str | None) -> list[dict[str, Any]]:
@@ -148,12 +97,6 @@ def _message_text(content: dict[str, Any]) -> str | None:
     return None
 
 
-def _cut(text: str, limit: int) -> str:
-    if len(text) <= limit:
-        return text
-    return text[:limit] + f"\n[... {len(text) - limit} more characters cut]"
-
-
 def _to_message(node: dict[str, Any]) -> Message | None:
     msg = node.get("message")
     if not isinstance(msg, dict):
@@ -168,7 +111,7 @@ def _to_message(node: dict[str, Any]) -> Message | None:
     if text is None:
         return None
     if role == "tool":
-        text = _cut(text, MAX_TOOL_CHARS)
+        text = cut(text)
     return Message(role=role, content=text, created_at=_timestamp(msg.get("create_time")))
 
 
@@ -200,12 +143,5 @@ def parse_conversation(raw: dict[str, Any]) -> ConversationIn:
 
 def read_export(path: Path | str) -> ParsedExport:
     """Read a ChatGPT export. Bad conversations are skipped with a reason, not fatal."""
-    result = ParsedExport()
-    for index, raw in enumerate(load_raw_conversations(Path(path))):
-        label = (raw.get("title") if isinstance(raw, dict) else None) or f"conversation #{index + 1}"
-        try:
-            result.conversations.append(parse_conversation(raw))
-        except (ValueError, ValidationError) as exc:
-            reason = exc.errors()[0]["msg"] if isinstance(exc, ValidationError) else str(exc)
-            result.skipped.append(f"{label}: {reason}")
-    return result
+    raw_items = load_json_lists(Path(path), _CONV_FILE, "ChatGPT")
+    return run_parser(raw_items, parse_conversation, title_key="title")
