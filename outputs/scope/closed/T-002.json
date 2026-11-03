@@ -1,0 +1,29 @@
+{
+  "task_id": "T-002",
+  "goal": "Define the Context Pack format as Pydantic models in contextos/pack/model.py. Fields: summary, decisions (with reasons), open_questions, next_steps, key_facts, code_snippets, file_refs, source (tool, date, link), and an optional raw_transcript. Add a `contextos schema` command that writes the JSON schema to a file. Write SPEC.md to describe the format.",
+  "allowed_files": [
+    "contextos/pack/**",
+    "contextos/cli.py",
+    "tests/**",
+    "SPEC.md",
+    "schemas/context-pack.schema.json",
+    "README.md",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [
+    ".env",
+    "scripts/**",
+    "docs/**",
+    "schemas/agent_state.schema.json",
+    "schemas/scope_contract.schema.json",
+    "schemas/task_board.schema.json",
+    "pyproject.toml"
+  ],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_pack_model.py",
+    "contextos schema --out schemas/context-pack.schema.json"
+  ],
+  "rollback_plan": "Delete contextos/pack/, tests/test_pack_model.py, SPEC.md and schemas/context-pack.schema.json; revert the schema command in contextos/cli.py.",
+  "approvals_required": []
+}

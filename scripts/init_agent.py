@@ -15,8 +15,8 @@ ROOT = Path(__file__).resolve().parent.parent
 REPORT_PATH = ROOT / "init_report.json"
 STATE_PATH = ROOT / "agent_state.json"
 REQUIRED_PYTHON = (3, 12)
-# Only what every task needs. T-001 adds typer and pydantic; add them here after it is done.
-REQUIRED_DEPS: list[str] = ["pytest"]
+# Import names. Install with: pip install -e ".[dev]"
+REQUIRED_DEPS: list[str] = ["contextos", "typer", "pydantic", "pytest"]
 TEST_COMMAND = os.environ.get("WORKBENCH_TEST_COMMAND", "python")
 # Stage 1 needs no environment variables. Tests must not need API keys.
 REQUIRED_ENV: list[str] = []
