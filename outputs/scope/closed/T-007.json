@@ -1,0 +1,27 @@
+{
+  "task_id": "T-007",
+  "goal": "Add `contextos list` (shows imported conversations: ID, source, title, date, message count; can filter with --source) and `contextos show <id>` (prints the conversation).",
+  "allowed_files": [
+    "contextos/cli.py",
+    "tests/test_cli_list_show.py",
+    "README.md",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [
+    ".env",
+    "scripts/**",
+    "docs/**",
+    "schemas/**",
+    "pyproject.toml",
+    "contextos/pack/**",
+    "contextos/store.py",
+    "contextos/importers/**",
+    "tests/fixtures/**"
+  ],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_cli_list_show.py"
+  ],
+  "rollback_plan": "Delete tests/test_cli_list_show.py; remove the list and show commands from contextos/cli.py and their README section.",
+  "approvals_required": []
+}

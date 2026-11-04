@@ -69,6 +69,17 @@ full history is kept, with a note where compaction happened.
 Known limit: when Claude runs several tools at once, a few of those tool lines can be
 missing. Your prompts and Claude's answers are never lost.
 
+## Looking at your chats
+
+```
+contextos list                        # every imported chat, newest first
+contextos list --source claude-code   # only one tool: chatgpt, claude-ai or claude-code
+contextos show <id>                   # print one chat, using the ID from the list
+```
+
+The list shows the ID, the tool it came from, the date of the last change, the number of
+messages and the title. All dates and times are shown in UTC.
+
 ## The Context Pack format
 
 A pack is plain JSON with a title, summary, decisions, open questions, next steps, key facts,
