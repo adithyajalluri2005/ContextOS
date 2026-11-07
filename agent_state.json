@@ -29,5 +29,5 @@
         "Real ChatGPT and Claude.ai exports not yet tested; the human is waiting for the export emails.",
         "No provider has been tried against a real AI service yet (needs the human's keys or a local Ollama)."
     ],
-    "next_action": "Confirm the CI run for the T-013 push is green. Then ask the human what comes next (real exports, first real provider run, or new tasks)."
+    "next_action": "CI for T-013 (run 42382729673) is green on all 6 jobs. Ask the human what comes next (real exports, first real provider run, or new tasks)."
 }
