@@ -98,6 +98,19 @@ with Ollama it stays on your computer.
 
 Long chats are summarized in parts, and the part summaries are then combined into one pack.
 
+## Making a Context Pack
+
+```
+contextos pack <id> --out context.md          # Markdown to paste into a new chat
+contextos pack <id> --format json -o pack.json
+contextos pack <id> --format claude-md >> CLAUDE.md   # a section for CLAUDE.md or AGENTS.md
+```
+
+Without `--out` the pack is printed to the screen; progress messages go to stderr, so
+you can send the output straight into a file. Add `--with-transcript` to include the
+full conversation as well. The `claude-md` section starts with `<!-- contextos:start -->`
+and ends with `<!-- contextos:end -->`, so you can find it and replace it later.
+
 ## The Context Pack format
 
 A pack is plain JSON with a title, summary, decisions, open questions, next steps, key facts,

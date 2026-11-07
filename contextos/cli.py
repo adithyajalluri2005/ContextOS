@@ -231,3 +231,65 @@ def show_conversation(
         stamp = f", {_datetime(msg.created_at)}" if msg.created_at else ""
         typer.echo(f"\n--- {msg.role}{stamp} ---")
         typer.echo(msg.content)
+
+
+# --- pack --------------------------------------------------------------------
+
+
+def get_provider():
+    """Pick the AI provider from the environment. A separate function so tests can replace it."""
+    from contextos.llm import get_provider as from_env
+
+    return from_env()
+
+
+@app.command("pack")
+def pack_conversation(
+    conversation_id: Annotated[int, typer.Argument(metavar="ID", help="The ID from `contextos list`.")],
+    out: Annotated[
+        Optional[Path],
+        typer.Option("--out", "-o", help="File to write. Prints to the screen if left out."),
+    ] = None,
+    fmt: Annotated[
+        str,
+        typer.Option("--format", "-f", help="markdown (paste into a chat), json, or claude-md (for CLAUDE.md / AGENTS.md)."),
+    ] = "markdown",
+    with_transcript: Annotated[
+        bool,
+        typer.Option("--with-transcript", help="Also include the full conversation. Makes the pack much longer."),
+    ] = False,
+) -> None:
+    """Build a Context Pack from one conversation, so you can continue it in another tool."""
+    from contextos.llm import ProviderError
+    from contextos.pack import FORMATS, render
+    from contextos.pack.builder import PackBuildError, build_pack
+
+    if fmt not in FORMATS:
+        typer.echo(f"Error: unknown format '{fmt}'. Choose one of: {', '.join(FORMATS)}.", err=True)
+        raise typer.Exit(code=2)
+
+    with Store() as store:
+        conv = store.get(conversation_id)
+    if conv is None:
+        typer.echo(f"Error: no conversation with ID {conversation_id}. Run `contextos list` to see the IDs.", err=True)
+        raise typer.Exit(code=1)
+
+    def progress(step: str) -> None:
+        typer.echo(step, err=True)
+
+    try:
+        provider = get_provider()
+        progress(f"Building the pack with {provider.name} ({provider.model}) ...")
+        pack = build_pack(conv, provider, include_transcript=with_transcript, progress=progress)
+    except (ProviderError, PackBuildError) as exc:
+        typer.echo(f"Error: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+
+    text = render(pack, fmt)
+    if out is None:
+        typer.echo(text, nl=False)
+        return
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with out.open("w", encoding="utf-8", newline="\n") as fh:
+        fh.write(text)
+    typer.echo(f"Wrote {out}", err=True)

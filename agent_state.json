@@ -1,23 +1,31 @@
 {
-    "schema_version":  1,
-    "active_task_id":  null,
-    "touched_files":  [
-                          "contextos/cli.py",
-                          "tests/test_cli_list_show.py",
-                          "README.md",
-                          "outputs/scope/closed/T-007.json",
-                          "task_board.json",
-                          "agent_state.json"
-                      ],
-    "assumptions":  [
-                        "list and show use the existing Store.list_conversations and Store.get; store.py was not changed.",
-                        "--source accepts only chatgpt, claude-ai, claude-code (exit code 2 otherwise). The list is kept in SOURCES in cli.py; add new importers there.",
-                        "The list date is the last change, else the start date, else the import time. All dates and times print in UTC so output is the same on every machine.",
-                        "Titles in the list are cut to 60 characters and new lines are turned into spaces. Untitled chats show (untitled).",
-                        "show prints a header (title, source and original ID, start, last change, link if any, message count) and then each message as \u0027--- role, time ---\u0027 followed by the text as is."
-                    ],
-    "blockers":  [
-                     "Real ChatGPT and Claude.ai exports not yet tested; the human is waiting for the export emails."
-                 ],
-    "next_action":  "write outputs/scope/closed/T-008.json, then start T-008 (model provider layer and pack builder)"
+    "schema_version": 1,
+    "active_task_id": null,
+    "touched_files": [
+        "contextos/pack/render.py",
+        "contextos/pack/__init__.py",
+        "contextos/cli.py",
+        "tests/test_pack_render.py",
+        "tests/test_cli_pack.py",
+        "README.md",
+        "outputs/scope/closed/T-009.json",
+        "task_board.json",
+        "agent_state.json"
+    ],
+    "assumptions": [
+        "Human approved anthropic and openai as optional extras only (contextos[anthropic], contextos[openai]). Ollama uses urllib. CI installs .[dev] only; the 3 tests that need the real packages skip there.",
+        "Provider.complete(system, prompt, schema=None) -> str. get_provider() reads CONTEXTOS_PROVIDER (anthropic|openai|ollama|fake) and CONTEXTOS_MODEL. Keys come only from ANTHROPIC_API_KEY / OPENAI_API_KEY and are passed explicitly to the client.",
+        "Anthropic: default claude-opus-5-5, client.beta.messages.create, effort medium, output_config.format json_schema, fallbacks='default' with beta server-side-fallback-2026-07-01 (only on fable-5-1/opus-5-5/opus-5/sonnet-5-5). Checked against anthropic 2.4.0 signatures; never called for real.",
+        "OpenAI: default gpt-5 (not checked against a live account), chat.completions with strict json_schema. Ollama: default llama3.1, /api/chat, format=schema, num_ctx 16384.",
+        "Builder (contextos/pack/builder.py): one request if the chat fits provider.max_input_chars - 4000; else parts split on message boundaries, notes per part, then merged in rounds (each round at least halves). One retry on unusable JSON, then PackBuildError. Title: model's title, else original title, else 'Untitled conversation'.",
+        "build_pack(..., progress=callback) gives step messages for the CLI in T-009.",
+        "T-009: renderers in contextos/pack/render.py (markdown, json, claude-md); they only format, empty sections left out. claude-md section is wrapped in <!-- contextos:start --> / <!-- contextos:end --> with ### headings.",
+        "T-009: `contextos pack ID [-o FILE] [-f markdown|json|claude-md] [--with-transcript]`. Progress and errors go to stderr; pack goes to stdout or the file. cli.get_provider() is a small wrapper so tests can replace it.",
+        "T-008 and T-009 work is not yet committed; the human commits per task."
+    ],
+    "blockers": [
+        "Real ChatGPT and Claude.ai exports not yet tested; the human is waiting for the export emails.",
+        "No provider has been tried against a real AI service yet (needs the human's keys or a local Ollama)."
+    ],
+    "next_action": "write outputs/scope/closed/T-010.json, then start T-010 (secret hiding). Hook redaction in cli.pack_conversation before render()."
 }

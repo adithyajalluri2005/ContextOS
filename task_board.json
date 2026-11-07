@@ -85,7 +85,7 @@
       "python -m pytest tests/test_pack_render.py",
       "python -m pytest tests/test_cli_pack.py"
     ],
-    "status": "todo"
+    "status": "done"
   },
   {
     "id": "T-010",
