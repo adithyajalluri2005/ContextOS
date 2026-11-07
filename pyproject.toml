@@ -25,6 +25,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# AI providers are optional: install only the one you use. Ollama needs nothing extra.
+anthropic = ["anthropic>=2.4"]
+openai = ["openai>=3.0"]
 dev = [
   "pytest>=8",
 ]

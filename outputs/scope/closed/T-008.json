@@ -1,0 +1,32 @@
+{
+  "task_id": "T-008",
+  "goal": "Add a model provider layer in contextos/llm/: one shared interface, with Anthropic, OpenAI and Ollama providers plus a FakeProvider for tests. Pick the provider with CONTEXTOS_PROVIDER, and read keys only from environment variables. Build the pack builder that turns a conversation into a Context Pack. Long chats are summarized in pieces, and those summaries are then combined.",
+  "allowed_files": [
+    "contextos/llm/**",
+    "contextos/pack/builder.py",
+    "pyproject.toml",
+    ".env.example",
+    "tests/test_pack_builder.py",
+    "README.md",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [
+    ".env",
+    "scripts/**",
+    "docs/**",
+    "schemas/**",
+    "contextos/pack/model.py",
+    "contextos/store.py",
+    "contextos/importers/**",
+    "contextos/cli.py",
+    "tests/fixtures/**"
+  ],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_pack_builder.py"
+  ],
+  "rollback_plan": "Delete contextos/llm/, contextos/pack/builder.py, tests/test_pack_builder.py and .env.example; remove the anthropic and openai extras from pyproject.toml and the provider section from README.md.",
+  "approvals_required": [
+    "Human approved on 2026-11-04: anthropic and openai Python packages as optional extras only (contextos[anthropic], contextos[openai]); Ollama uses the standard library."
+  ]
+}

@@ -75,7 +75,7 @@
     "acceptance": [
       "python -m pytest tests/test_pack_builder.py"
     ],
-    "status": "todo"
+    "status": "done"
   },
   {
     "id": "T-009",

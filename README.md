@@ -80,6 +80,24 @@ contextos show <id>                   # print one chat, using the ID from the li
 The list shows the ID, the tool it came from, the date of the last change, the number of
 messages and the title. All dates and times are shown in UTC.
 
+## Choosing an AI model
+
+A Context Pack is written by an AI model. Pick one with environment variables
+(see `.env.example`):
+
+| `CONTEXTOS_PROVIDER` | Install | Key | Default model |
+| --- | --- | --- | --- |
+| `anthropic` | `pip install "contextos[anthropic]"` | `ANTHROPIC_API_KEY` | `claude-opus-5-5` |
+| `openai` | `pip install "contextos[openai]"` | `OPENAI_API_KEY` | `gpt-5` |
+| `ollama` | nothing extra; Ollama must be running | none | `llama3.1` |
+| `fake` | nothing | none | answers without any AI, for tests |
+
+Set `CONTEXTOS_MODEL` to use another model. Keys are read only from environment
+variables and are never saved. Your chat text is sent to the provider you choose;
+with Ollama it stays on your computer.
+
+Long chats are summarized in parts, and the part summaries are then combined into one pack.
+
 ## The Context Pack format
 
 A pack is plain JSON with a title, summary, decisions, open questions, next steps, key facts,
