@@ -2,15 +2,10 @@
     "schema_version": 1,
     "active_task_id": null,
     "touched_files": [
-        "contextos/redact.py",
-        "contextos/pack/model.py",
-        "contextos/pack/render.py",
-        "contextos/cli.py",
-        "schemas/context-pack.schema.json",
-        "SPEC.md",
-        "tests/test_redact.py",
+        "tests/test_end_to_end.py",
         "README.md",
-        "outputs/scope/closed/T-010.json",
+        "CONTRIBUTING.md",
+        "outputs/scope/closed/T-011.json",
         "task_board.json",
         "agent_state.json"
     ],
@@ -24,11 +19,12 @@
         "T-009: renderers in contextos/pack/render.py (markdown, json, claude-md); they only format, empty sections left out. claude-md section is wrapped in <!-- contextos:start --> / <!-- contextos:end --> with ### headings.",
         "T-009: `contextos pack ID [-o FILE] [-f markdown|json|claude-md] [--with-transcript]`. Progress and errors go to stderr; pack goes to stdout or the file. cli.get_provider() is a small wrapper so tests can replace it.",
         "T-010: contextos/redact.py. The chat is cleaned before it goes to the model, and the finished pack is cleaned again. Markers look like [hidden: email]. New optional pack field `redacted` (kind -> count); {} = ran, found nothing; missing = --no-redact. Schema file and SPEC.md updated.",
-        "T-010: phone numbers need 10-15 digits plus a separator or a leading +; dates, IPs and plain long numbers are kept. Test secrets are built from pieces to avoid GitHub secret scanning."
+        "T-010: phone numbers need 10-15 digits plus a separator or a leading +; dates, IPs and plain long numbers are kept. Test secrets are built from pieces to avoid GitHub secret scanning.",
+        "T-011: README now opens with a 30-second demo (fixture + fake provider, CONTEXTOS_HOME=demo-home); checked by hand and by tests/test_end_to_end.py, which also runs the demo as a separate process."
     ],
     "blockers": [
         "Real ChatGPT and Claude.ai exports not yet tested; the human is waiting for the export emails.",
         "No provider has been tried against a real AI service yet (needs the human's keys or a local Ollama)."
     ],
-    "next_action": "write outputs/scope/closed/T-011.json, then start T-011 (end-to-end test, README rewrite, CONTRIBUTING.md)."
+    "next_action": "T-012 (MCP server) needs a new runtime dependency (the MCP Python SDK). Ask the human to approve it before writing outputs/scope/closed/T-012.json."
 }

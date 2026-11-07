@@ -2,27 +2,46 @@
 
 **Move your AI conversations between tools, accounts and teammates.**
 
-Export a chat from ChatGPT, Claude or a coding agent like Claude Code, turn it into a
-short, portable *Context Pack*, and continue the work in any other AI tool. You can also
-share the pack with your team.
+Export a chat from ChatGPT, Claude or Claude Code, turn it into a short, portable
+*Context Pack*, and continue the work in any other AI tool. You can also share the
+pack with your team.
 
-> Status: early development. See `task_board.json` for the build plan.
+> Status: early development. Everything below works today; an MCP server is next.
 
-## Planned first version
+## 30-second demo
 
-```
-contextos import chatgpt export.zip      # official ChatGPT data export
-contextos import claude-ai export.zip    # official Claude data export
-contextos import claude-code             # local Claude Code sessions
+No account and no API key needed. This uses a small made-up ChatGPT export that comes
+with the repository, and the `fake` provider, which answers without calling any AI.
+
+```powershell
+pip install -e .
+$env:CONTEXTOS_HOME = "$PWD\demo-home"     # keep the demo away from your real data
+$env:CONTEXTOS_PROVIDER = "fake"
+contextos import chatgpt tests/fixtures/chatgpt_export.zip
 contextos list
-contextos pack <id> --out context.md     # paste this into your next chat
+contextos pack 1 --out context.md
 ```
 
-Later: an MCP server so AI tools can fetch packs themselves, a browser extension, and team sharing.
+On macOS or Linux, set the two variables with `export CONTEXTOS_HOME=$PWD/demo-home`
+and `export CONTEXTOS_PROVIDER=fake`.
+
+The import says it skipped 2 chats: the test export holds broken chats on purpose.
+`contextos list` shows the imported chats with their IDs, and `context.md` is a pack you
+could paste into a new chat. Delete the `demo-home` folder when you are done. With the fake provider the summary is only a placeholder.
+For a real one, pick an AI model (see [Choosing an AI model](#choosing-an-ai-model)) and
+import your own export.
+
+## Everyday use
+
+```
+contextos import chatgpt export.zip        # or: claude-ai export.zip, or: claude-code
+contextos list                             # find the chat you want
+contextos pack <id> --out context.md       # paste context.md into your next chat
+```
 
 ## Importing chats
 
-### ChatGPT (works now)
+### ChatGPT
 
 1. In ChatGPT, open **Settings → Data controls → Export data** and confirm.
 2. You get an email with a download link. Download the ZIP file.
@@ -37,7 +56,7 @@ only adds new chats and updates changed ones. When you edited a message or asked
 new answer, only the version you ended on is kept. Images become `[image]`, and long
 code-tool output is shortened.
 
-### Claude.ai (works now)
+### Claude.ai
 
 1. In Claude, open **Settings → Privacy → Export data**.
 2. You get an email with a download link. Download the ZIP file.
@@ -51,7 +70,7 @@ The same rules apply: running it again does not make copies, and only the branch
 ended on is kept. Text from attached files is kept (shortened if very long). Claude's
 hidden thinking and raw tool results are left out; a tool call shows as `[used tool: name]`.
 
-### Claude Code (works now)
+### Claude Code
 
 Claude Code already saves every session on your computer, so there is nothing to export:
 
@@ -69,6 +88,8 @@ full history is kept, with a note where compaction happened.
 Known limit: when Claude runs several tools at once, a few of those tool lines can be
 missing. Your prompts and Claude's answers are never lost.
 
+Want another tool? See [CONTRIBUTING.md](CONTRIBUTING.md#how-to-add-a-new-importer).
+
 ## Looking at your chats
 
 ```
@@ -80,36 +101,20 @@ contextos show <id>                   # print one chat, using the ID from the li
 The list shows the ID, the tool it came from, the date of the last change, the number of
 messages and the title. All dates and times are shown in UTC.
 
-## Choosing an AI model
-
-A Context Pack is written by an AI model. Pick one with environment variables
-(see `.env.example`):
-
-| `CONTEXTOS_PROVIDER` | Install | Key | Default model |
-| --- | --- | --- | --- |
-| `anthropic` | `pip install "contextos[anthropic]"` | `ANTHROPIC_API_KEY` | `claude-opus-5-5` |
-| `openai` | `pip install "contextos[openai]"` | `OPENAI_API_KEY` | `gpt-5` |
-| `ollama` | nothing extra; Ollama must be running | none | `llama3.1` |
-| `fake` | nothing | none | answers without any AI, for tests |
-
-Set `CONTEXTOS_MODEL` to use another model. Keys are read only from environment
-variables and are never saved. Your chat text is sent to the provider you choose;
-with Ollama it stays on your computer.
-
-Long chats are summarized in parts, and the part summaries are then combined into one pack.
-
 ## Making a Context Pack
 
 ```
-contextos pack <id> --out context.md          # Markdown to paste into a new chat
-contextos pack <id> --format json -o pack.json
-contextos pack <id> --format claude-md >> CLAUDE.md   # a section for CLAUDE.md or AGENTS.md
+contextos pack <id> --out context.md                 # Markdown to paste into a new chat
+contextos pack <id> --format json -o pack.json       # the pack as data
+contextos pack <id> --format claude-md >> CLAUDE.md  # a section for CLAUDE.md or AGENTS.md
 ```
 
 Without `--out` the pack is printed to the screen; progress messages go to stderr, so
 you can send the output straight into a file. Add `--with-transcript` to include the
 full conversation as well. The `claude-md` section starts with `<!-- contextos:start -->`
 and ends with `<!-- contextos:end -->`, so you can find it and replace it later.
+
+Long chats are summarized in parts, and the part summaries are then combined into one pack.
 
 ### Hiding secrets
 
@@ -122,6 +127,22 @@ before it is written. The pack records only how many items of each kind were hid
 `--no-redact` turns this off and prints a warning. Use it only for chats you are sure
 are safe to share.
 
+## Choosing an AI model
+
+A Context Pack is written by an AI model. Pick one with environment variables
+(see `.env.example`):
+
+| `CONTEXTOS_PROVIDER` | Install | Key | Default model |
+| --- | --- | --- | --- |
+| `anthropic` | `pip install "contextos[anthropic]"` | `ANTHROPIC_API_KEY` | `claude-opus-5-5` |
+| `openai` | `pip install "contextos[openai]"` | `OPENAI_API_KEY` | `gpt-5` |
+| `ollama` | nothing extra; Ollama must be running | none | `llama3.1` |
+| `fake` | nothing | none | answers without any AI, for tests and the demo |
+
+Set `CONTEXTOS_MODEL` to use another model. Keys are read only from environment
+variables and are never saved. Your chat text (with secrets hidden) is sent to the
+provider you choose; with Ollama it stays on your computer.
+
 ## The Context Pack format
 
 A pack is plain JSON with a title, summary, decisions, open questions, next steps, key facts,
@@ -133,7 +154,8 @@ The schema is in [`schemas/context-pack.schema.json`](schemas/context-pack.schem
 
 Imported chats are stored only on your computer, in a SQLite file at
 `~/.contextos/contextos.db`. Set the `CONTEXTOS_HOME` environment variable to use a
-different folder. Nothing is uploaded anywhere.
+different folder. Nothing is uploaded, except the chat text sent to the AI provider you
+choose when you make a pack.
 
 ## Development setup
 
@@ -146,6 +168,8 @@ pip install -e ".[dev]"
 contextos --version
 python -m pytest tests
 ```
+
+Tests never call a real AI service. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
