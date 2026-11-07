@@ -113,6 +113,6 @@
     "acceptance": [
       "python -m pytest tests/test_mcp_server.py"
     ],
-    "status": "todo"
+    "status": "done"
   }
 ]

@@ -2,10 +2,15 @@
     "schema_version": 1,
     "active_task_id": null,
     "touched_files": [
-        "tests/test_end_to_end.py",
+        "contextos/service.py",
+        "contextos/mcp_server.py",
+        "contextos/cli.py",
+        "contextos/store.py",
+        "pyproject.toml",
+        "tests/test_mcp_server.py",
+        "tests/test_store.py",
         "README.md",
-        "CONTRIBUTING.md",
-        "outputs/scope/closed/T-011.json",
+        "outputs/scope/closed/T-012.json",
         "task_board.json",
         "agent_state.json"
     ],
@@ -20,11 +25,14 @@
         "T-009: `contextos pack ID [-o FILE] [-f markdown|json|claude-md] [--with-transcript]`. Progress and errors go to stderr; pack goes to stdout or the file. cli.get_provider() is a small wrapper so tests can replace it.",
         "T-010: contextos/redact.py. The chat is cleaned before it goes to the model, and the finished pack is cleaned again. Markers look like [hidden: email]. New optional pack field `redacted` (kind -> count); {} = ran, found nothing; missing = --no-redact. Schema file and SPEC.md updated.",
         "T-010: phone numbers need 10-15 digits plus a separator or a leading +; dates, IPs and plain long numbers are kept. Test secrets are built from pieces to avoid GitHub secret scanning.",
-        "T-011: README now opens with a 30-second demo (fixture + fake provider, CONTEXTOS_HOME=demo-home); checked by hand and by tests/test_end_to_end.py, which also runs the demo as a separate process."
+        "T-011: README now opens with a 30-second demo (fixture + fake provider, CONTEXTOS_HOME=demo-home); checked by hand and by tests/test_end_to_end.py, which also runs the demo as a separate process.",
+        "T-012: human approved mcp>=2.3 as optional extra contextos[mcp] (also in dev extra for CI). SDK 2.x: mcp.server.mcpserver.MCPServer and mcp.Client (FastMCP was renamed).",
+        "T-012: contextos/service.make_pack is the one shared path (redaction + builder) for CLI and MCP. MCP always hides secrets, also in titles and search snippets; no --no-redact over MCP.",
+        "T-012: Store.search: every word must appear in title or a message; LIKE with '!' escape; case-insensitive for English letters only."
     ],
     "blockers": [
         "Real ChatGPT and Claude.ai exports not yet tested; the human is waiting for the export emails.",
         "No provider has been tried against a real AI service yet (needs the human's keys or a local Ollama)."
     ],
-    "next_action": "T-012 (MCP server) needs a new runtime dependency (the MCP Python SDK). Ask the human to approve it before writing outputs/scope/closed/T-012.json."
+    "next_action": "All tasks on the board are done. Ask the human what comes next (real-export testing, a real provider run, or new tasks)."
 }

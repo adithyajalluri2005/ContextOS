@@ -200,3 +200,40 @@ def test_input_is_validated():
         ConversationIn(source_tool="", source_id="x")
     with pytest.raises(ValidationError):
         ConversationIn(source_tool="chatgpt", source_id="x", created_at=datetime(2026, 1, 1))
+
+
+# --- search ------------------------------------------------------------------
+
+
+def _save_for_search(store):
+    a, _ = store.save(
+        ConversationIn(
+            source_tool="chatgpt",
+            source_id="s1",
+            title="Docker notes",
+            messages=[Message(role="user", content="How do I shrink a Docker image? " + "x" * 300 + " use multi-stage builds")],
+        )
+    )
+    b, _ = store.save(ConversationIn(source_tool="claude-ai", source_id="s2", title="Multi-stage builds explained"))
+    return a, b
+
+
+def test_search_matches_title_or_messages_and_shortens_snippets(tmp_path):
+    with Store(tmp_path / "s.db") as store:
+        a, b = _save_for_search(store)
+        hits = store.search("multi-stage")
+        assert {h.id for h in hits} == {a, b}
+        by_id = {h.id: h for h in hits}
+        assert by_id[b].snippet is None  # matched the title only
+        snip = by_id[a].snippet
+        assert snip.startswith("...") and snip.endswith("use multi-stage builds")
+        assert len(snip) < 200
+
+
+def test_search_needs_every_word_and_respects_limit(tmp_path):
+    with Store(tmp_path / "s.db") as store:
+        a, b = _save_for_search(store)
+        assert [h.id for h in store.search("docker shrink")] == [a]
+        assert store.search("docker kubernetes") == []
+        assert store.search("   ") == []
+        assert len(store.search("builds", limit=1)) == 1

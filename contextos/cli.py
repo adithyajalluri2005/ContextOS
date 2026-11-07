@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-from collections import Counter
 from collections.abc import Callable
 from datetime import datetime, timezone
 from pathlib import Path
@@ -267,8 +266,8 @@ def pack_conversation(
     """Build a Context Pack from one conversation, so you can continue it in another tool."""
     from contextos.llm import ProviderError
     from contextos.pack import FORMATS, render
-    from contextos.pack.builder import PackBuildError, build_pack
-    from contextos.redact import ordered, redact_model
+    from contextos.pack.builder import PackBuildError
+    from contextos.service import make_pack
 
     if fmt not in FORMATS:
         typer.echo(f"Error: unknown format '{fmt}'. Choose one of: {', '.join(FORMATS)}.", err=True)
@@ -283,30 +282,23 @@ def pack_conversation(
     def progress(step: str) -> None:
         typer.echo(step, err=True)
 
-    hidden: Counter[str] = Counter()
     if no_redact:
         typer.echo(
             "Warning: hiding is off. The chat is sent to the AI provider as it is, and the pack may "
             "contain API keys, passwords, emails or phone numbers.",
             err=True,
         )
-    else:
-        # Clean the chat before the model sees it.
-        conv = redact_model(conv, hidden)
 
     try:
         provider = get_provider()
         progress(f"Building the pack with {provider.name} ({provider.model}) ...")
-        pack = build_pack(conv, provider, include_transcript=with_transcript, progress=progress)
+        pack = make_pack(conv, provider, include_transcript=with_transcript, redact=not no_redact, progress=progress)
     except (ProviderError, PackBuildError) as exc:
         typer.echo(f"Error: {exc}", err=True)
         raise typer.Exit(code=1) from exc
 
-    if not no_redact:
-        # Check the finished pack again, then record only how many items were hidden.
-        pack = redact_model(pack, hidden).model_copy(update={"redacted": ordered(hidden)})
-        if hidden:
-            progress(f"Hid {sum(hidden.values())} item(s) for privacy.")
+    if pack.redacted:
+        progress(f"Hid {sum(pack.redacted.values())} item(s) for privacy.")
 
     text = render(pack, fmt)
     if out is None:
@@ -316,3 +308,19 @@ def pack_conversation(
     with out.open("w", encoding="utf-8", newline="\n") as fh:
         fh.write(text)
     typer.echo(f"Wrote {out}", err=True)
+
+
+# --- mcp ---------------------------------------------------------------------
+
+
+@app.command("mcp")
+def mcp_command() -> None:
+    """Run the MCP server over stdio, so AI tools can list, search and pack your chats."""
+    try:
+        from contextos import mcp_server
+    except ImportError as exc:
+        if exc.name is None or not exc.name.startswith("mcp"):
+            raise
+        typer.echo('Error: the MCP server needs an extra package. Install it with: pip install "contextos[mcp]"', err=True)
+        raise typer.Exit(code=1) from exc
+    mcp_server.run()

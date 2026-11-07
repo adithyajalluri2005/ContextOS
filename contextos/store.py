@@ -105,6 +105,29 @@ class Conversation(ConversationSummary):
     messages: list[Message]
 
 
+class SearchHit(ConversationSummary):
+    """One result of `Store.search`."""
+
+    snippet: str | None = None  # text around the first match in a message; None if only the title matched
+
+
+SNIPPET_CHARS = 80  # shown on each side of the match
+
+
+def _escape_like(text: str) -> str:
+    """Make % and _ in user text match themselves in LIKE. "!" is the escape character."""
+    return text.replace("!", "!!").replace("%", "!%").replace("_", "!_")
+
+
+def _snippet(content: str, word: str) -> str:
+    flat = " ".join(content.split())
+    at = flat.lower().find(word.lower())
+    if at < 0:
+        return flat[: 2 * SNIPPET_CHARS]
+    start, end = max(0, at - SNIPPET_CHARS), min(len(flat), at + len(word) + SNIPPET_CHARS)
+    return ("..." if start else "") + flat[start:end] + ("..." if end < len(flat) else "")
+
+
 def _to_db(value: datetime | None) -> str | None:
     return value.astimezone(timezone.utc).isoformat() if value else None
 
@@ -237,6 +260,38 @@ class Store:
             Message(role=m["role"], content=m["content"], created_at=_from_db(m["created_at"])) for m in msgs
         ]
         return Conversation(**self._summary(row), messages=messages)
+
+    def search(self, query: str, *, limit: int = 20) -> list[SearchHit]:
+        """Conversations that contain every word of `query`, in the title or any message. Newest first.
+
+        Matching ignores upper and lower case (for English letters). Each hit carries a short
+        piece of text around the first match.
+        """
+        words = query.split()
+        if not words:
+            return []
+        sql = self._SUMMARY_SELECT + " WHERE 1"
+        params: list = []
+        for word in words:
+            pattern = "%" + _escape_like(word) + "%"
+            sql += (
+                " AND (c.title LIKE ? ESCAPE '!' OR EXISTS (SELECT 1 FROM messages m"
+                " WHERE m.conversation_id = c.id AND m.content LIKE ? ESCAPE '!'))"
+            )
+            params += [pattern, pattern]
+        sql += " ORDER BY COALESCE(c.updated_at, c.created_at, c.imported_at) DESC, c.id DESC LIMIT ?"
+        params.append(max(1, limit))
+        hits = []
+        for row in self._conn.execute(sql, params).fetchall():
+            first = "%" + _escape_like(words[0]) + "%"
+            msg = self._conn.execute(
+                "SELECT content FROM messages WHERE conversation_id = ? AND content LIKE ? ESCAPE '!'"
+                " ORDER BY position LIMIT 1",
+                (row["id"], first),
+            ).fetchone()
+            snippet = _snippet(msg["content"], words[0]) if msg else None
+            hits.append(SearchHit(**self._summary(row), snippet=snippet))
+        return hits
 
     def count(self) -> int:
         return self._conn.execute("SELECT COUNT(*) FROM conversations").fetchone()[0]

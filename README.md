@@ -6,7 +6,7 @@ Export a chat from ChatGPT, Claude or Claude Code, turn it into a short, portabl
 *Context Pack*, and continue the work in any other AI tool. You can also share the
 pack with your team.
 
-> Status: early development. Everything below works today; an MCP server is next.
+> Status: early development. Everything below works today.
 
 ## 30-second demo
 
@@ -142,6 +142,35 @@ A Context Pack is written by an AI model. Pick one with environment variables
 Set `CONTEXTOS_MODEL` to use another model. Keys are read only from environment
 variables and are never saved. Your chat text (with secrets hidden) is sent to the
 provider you choose; with Ollama it stays on your computer.
+
+## Using ContextOS from AI tools (MCP)
+
+ContextOS can run as an MCP server, so an AI app or coding agent can find your chats and
+fetch packs by itself. MCP (Model Context Protocol) is the standard way AI tools connect
+to local helper programs.
+
+```
+pip install "contextos[mcp]"
+contextos mcp          # the AI tool starts this for you; it talks over stdin/stdout
+```
+
+It offers three tools:
+
+| Tool | What it does |
+| --- | --- |
+| `list_conversations` | Imported chats, newest first. Optional `source` and `limit`. |
+| `search` | Chats that contain every word of `query`, with a short piece of matching text. |
+| `get_context_pack` | A pack for one chat `id`, as `markdown` (default), `json` or `claude-md`. |
+
+It uses the same database and the same AI model settings as the command line, so set
+`CONTEXTOS_PROVIDER` (and a key, if needed) in the server's environment. Secrets are
+always hidden here, also in titles and search results. To add it to Claude Code:
+
+```
+claude mcp add contextos -e CONTEXTOS_PROVIDER=anthropic -e ANTHROPIC_API_KEY=... -- contextos mcp
+```
+
+Other apps take the same command (`contextos mcp`) in their MCP settings.
 
 ## The Context Pack format
 

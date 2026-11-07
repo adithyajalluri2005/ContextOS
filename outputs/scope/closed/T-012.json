@@ -1,0 +1,34 @@
+{
+  "task_id": "T-012",
+  "goal": "Stage 2: Add an MCP server (`contextos mcp`, using stdio) with the tools list_conversations, get_context_pack(id) and search(query). It must use the same store and pack builder as the command-line tool. Test it with a real MCP SDK client.",
+  "allowed_files": [
+    "contextos/service.py",
+    "contextos/mcp_server.py",
+    "contextos/cli.py",
+    "contextos/store.py",
+    "pyproject.toml",
+    "tests/test_mcp_server.py",
+    "tests/test_store.py",
+    "README.md",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [
+    ".env",
+    "scripts/**",
+    "docs/**",
+    "schemas/**",
+    "contextos/pack/**",
+    "contextos/llm/**",
+    "contextos/importers/**",
+    "contextos/redact.py",
+    "tests/fixtures/**"
+  ],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_mcp_server.py"
+  ],
+  "rollback_plan": "Delete contextos/mcp_server.py and contextos/service.py (move its code back into the pack command) and tests/test_mcp_server.py; remove the mcp command from contextos/cli.py, the search method and its tests from contextos/store.py and tests/test_store.py, the mcp extra from pyproject.toml and the MCP section from README.md.",
+  "approvals_required": [
+    "Human approved on 2026-11-07: the MCP Python SDK (`mcp`) as an optional extra only (contextos[mcp]), also listed in the dev extra so the tests run in CI."
+  ]
+}

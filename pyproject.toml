@@ -28,8 +28,11 @@ dependencies = [
 # AI providers are optional: install only the one you use. Ollama needs nothing extra.
 anthropic = ["anthropic>=2.4"]
 openai = ["openai>=3.0"]
+# The MCP server (`contextos mcp`) is optional too.
+mcp = ["mcp>=2.3"]
 dev = [
   "pytest>=8",
+  "mcp>=2.3",  # so the MCP server tests run in CI
 ]
 
 [project.scripts]
