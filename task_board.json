@@ -123,5 +123,15 @@
       "python -m pytest tests/test_mcp_server.py"
     ],
     "status": "done"
+  },
+  {
+    "id": "T-014",
+    "goal": "Let the ollama provider use Ollama's cloud service: read OLLAMA_API_KEY from the environment only, send it as a Bearer token, default to https://ollama.com when a key is set and OLLAMA_HOST is not, refuse to send a key over plain http to another computer, and give clear messages for a rejected key or unknown model. Tests never see the real key.",
+    "owner": "builder",
+    "acceptance": [
+      "python -m pytest tests/test_ollama_cloud.py",
+      "python -m pytest tests/test_pack_builder.py"
+    ],
+    "status": "done"
   }
 ]

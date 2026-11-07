@@ -1,0 +1,35 @@
+{
+  "task_id": "T-014",
+  "goal": "Let the ollama provider use Ollama's cloud service: read OLLAMA_API_KEY from the environment only, send it as a Bearer token, default to https://ollama.com when a key is set and OLLAMA_HOST is not, refuse to send a key over plain http to another computer, and give clear messages for a rejected key or unknown model. Tests never see the real key.",
+  "allowed_files": [
+    "contextos/llm/ollama_provider.py",
+    "contextos/llm/__init__.py",
+    "tests/test_ollama_cloud.py",
+    "tests/conftest.py",
+    ".env.example",
+    "README.md",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [
+    ".env",
+    "scripts/**",
+    "docs/**",
+    "schemas/**",
+    "pyproject.toml",
+    "contextos/pack/**",
+    "contextos/store.py",
+    "contextos/importers/**",
+    "contextos/cli.py",
+    "contextos/mcp_server.py",
+    "tests/fixtures/**"
+  ],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_ollama_cloud.py",
+    "python -m pytest tests/test_pack_builder.py"
+  ],
+  "rollback_plan": "Delete tests/test_ollama_cloud.py; revert contextos/llm/ollama_provider.py, tests/conftest.py, .env.example and the README Ollama row to the T-013 commit (git checkout ee7f003 -- <files>).",
+  "approvals_required": [
+    "Human chose on 2026-11-07: Ollama cloud support with OLLAMA_API_KEY, set by the human with setx (never pasted in chat)."
+  ]
+}

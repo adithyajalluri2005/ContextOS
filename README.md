@@ -137,11 +137,16 @@ A Context Pack is written by an AI model. Pick one with environment variables
 | `anthropic` | `pip install "contextos[anthropic]"` | `ANTHROPIC_API_KEY` | `claude-opus-5-5` |
 | `openai` | `pip install "contextos[openai]"` | `OPENAI_API_KEY` | `gpt-5` |
 | `ollama` | nothing extra; Ollama must be running | none | `llama3.1` |
+| `ollama` (cloud) | nothing extra | `OLLAMA_API_KEY` | `gpt-oss:120b` |
 | `fake` | nothing | none | answers without any AI, for tests and the demo |
 
 Set `CONTEXTOS_MODEL` to use another model. Keys are read only from environment
 variables and are never saved. Your chat text (with secrets hidden) is sent to the
-provider you choose; with Ollama it stays on your computer.
+provider you choose; with a local Ollama it stays on your computer.
+
+With `OLLAMA_API_KEY` set, the `ollama` provider uses Ollama's cloud service at
+`https://ollama.com` instead of a local Ollama. Cloud models are listed at
+https://ollama.com/search?c=cloud. The key is never sent over plain `http` to another computer.
 
 ## Using ContextOS from AI tools (MCP)
 
