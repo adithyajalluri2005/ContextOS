@@ -36,6 +36,7 @@ Status: **draft**. Fields may still change before version 1.0.
 | `file_refs` | list of [FileRef](#fileref) | no | Files the conversation talked about. |
 | `source` | [Source](#source) | **yes** | Where the conversation came from. |
 | `created_at` | date-time | no (default: now) | When this pack was made. |
+| `redacted` | map of kind to count | no | How many items of each kind were hidden for privacy, for example `{"email": 2, "OpenAI key": 1}`. The hidden text itself is never kept. `{}` means hiding ran and found nothing; left out means hiding was turned off. |
 | `raw_transcript` | list of [Message](#message) | no | The full conversation. Leave out to keep the pack small. |
 
 Text values are trimmed. `title`, `summary` and other required text must not be blank.

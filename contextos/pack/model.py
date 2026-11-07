@@ -90,6 +90,13 @@ class ContextPack(_PackModel):
     file_refs: list[FileRef] = Field(default_factory=list)
     source: Source
     created_at: AwareDatetime = Field(default_factory=_utc_now, description="When this pack was made.")
+    redacted: dict[str, int] | None = Field(
+        default=None,
+        description=(
+            "How many items of each kind were hidden for privacy, e.g. {\"email\": 2}. "
+            "Never the items themselves. Empty means nothing was found; left out means hiding was turned off."
+        ),
+    )
     raw_transcript: list[Message] | None = Field(
         default=None, description="Optional full conversation. Leave out to keep the pack small."
     )

@@ -1,0 +1,32 @@
+{
+  "task_id": "T-010",
+  "goal": "Hide secrets before any pack is written: API keys (OpenAI, Anthropic, AWS, GitHub), private keys, passwords in URLs, emails and phone numbers. Hiding is on by default; --no-redact turns it off and shows a warning. The pack lists how many items were hidden, but never the items themselves.",
+  "allowed_files": [
+    "contextos/redact.py",
+    "contextos/pack/model.py",
+    "contextos/pack/render.py",
+    "contextos/cli.py",
+    "schemas/context-pack.schema.json",
+    "SPEC.md",
+    "tests/test_redact.py",
+    "README.md",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [
+    ".env",
+    "scripts/**",
+    "docs/**",
+    "pyproject.toml",
+    "contextos/pack/builder.py",
+    "contextos/llm/**",
+    "contextos/store.py",
+    "contextos/importers/**",
+    "tests/fixtures/**"
+  ],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_redact.py"
+  ],
+  "rollback_plan": "Delete contextos/redact.py and tests/test_redact.py; remove the redacted field from contextos/pack/model.py, SPEC.md and the schema file (regenerate with contextos schema); remove the --no-redact option and the hidden-count line from contextos/cli.py and contextos/pack/render.py; remove the README section.",
+  "approvals_required": []
+}

@@ -316,6 +316,22 @@
       "title": "Created At",
       "type": "string"
     },
+    "redacted": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "How many items of each kind were hidden for privacy, e.g. {\"email\": 2}. Never the items themselves. Empty means nothing was found; left out means hiding was turned off.",
+      "title": "Redacted"
+    },
     "raw_transcript": {
       "anyOf": [
         {

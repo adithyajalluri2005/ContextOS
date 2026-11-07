@@ -74,6 +74,16 @@ def _source_line(pack: ContextPack) -> str:
     return ", ".join(parts) + "."
 
 
+def _hidden_line(pack: ContextPack) -> list[str]:
+    """One line saying how much was hidden for privacy. Only counts, never the hidden text."""
+    if not pack.redacted:
+        return []
+    total = sum(pack.redacted.values())
+    kinds = ", ".join(f"{kind}: {n}" for kind, n in pack.redacted.items())
+    noun = "item was" if total == 1 else "items were"
+    return [f"_{total} {noun} hidden for privacy ({kinds})._"]
+
+
 def _sections(pack: ContextPack, level: int) -> list[str]:
     """The body sections, each with a heading of the given level. Empty sections are skipped."""
     h = "#" * level
@@ -101,7 +111,7 @@ def render_markdown(pack: ContextPack) -> str:
         "This is a summary of an earlier conversation. Read it, then continue the work from "
         "where it stopped. Ask me if something important is missing."
     )
-    parts = [f"# Context: {_one_line(pack.title)}", intro, f"_{_source_line(pack)}_", *_sections(pack, 2)]
+    parts = [f"# Context: {_one_line(pack.title)}", intro, f"_{_source_line(pack)}_", *_hidden_line(pack), *_sections(pack, 2)]
     return "\n\n".join(parts) + "\n"
 
 
@@ -115,6 +125,7 @@ def render_claude_md(pack: ContextPack) -> str:
         CLAUDE_MD_START,
         f"## Context from an earlier conversation: {_one_line(pack.title)}",
         f"_{_source_line(pack)} Made by ContextOS on {_date(pack.created_at)}._",
+        *_hidden_line(pack),
         *_sections(pack, 3),
         CLAUDE_MD_END,
     ]

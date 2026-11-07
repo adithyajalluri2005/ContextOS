@@ -94,7 +94,7 @@
     "acceptance": [
       "python -m pytest tests/test_redact.py"
     ],
-    "status": "todo"
+    "status": "done"
   },
   {
     "id": "T-011",

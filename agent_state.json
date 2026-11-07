@@ -2,13 +2,15 @@
     "schema_version": 1,
     "active_task_id": null,
     "touched_files": [
+        "contextos/redact.py",
+        "contextos/pack/model.py",
         "contextos/pack/render.py",
-        "contextos/pack/__init__.py",
         "contextos/cli.py",
-        "tests/test_pack_render.py",
-        "tests/test_cli_pack.py",
+        "schemas/context-pack.schema.json",
+        "SPEC.md",
+        "tests/test_redact.py",
         "README.md",
-        "outputs/scope/closed/T-009.json",
+        "outputs/scope/closed/T-010.json",
         "task_board.json",
         "agent_state.json"
     ],
@@ -21,11 +23,12 @@
         "build_pack(..., progress=callback) gives step messages for the CLI in T-009.",
         "T-009: renderers in contextos/pack/render.py (markdown, json, claude-md); they only format, empty sections left out. claude-md section is wrapped in <!-- contextos:start --> / <!-- contextos:end --> with ### headings.",
         "T-009: `contextos pack ID [-o FILE] [-f markdown|json|claude-md] [--with-transcript]`. Progress and errors go to stderr; pack goes to stdout or the file. cli.get_provider() is a small wrapper so tests can replace it.",
-        "T-008 and T-009 work is not yet committed; the human commits per task."
+        "T-010: contextos/redact.py. The chat is cleaned before it goes to the model, and the finished pack is cleaned again. Markers look like [hidden: email]. New optional pack field `redacted` (kind -> count); {} = ran, found nothing; missing = --no-redact. Schema file and SPEC.md updated.",
+        "T-010: phone numbers need 10-15 digits plus a separator or a leading +; dates, IPs and plain long numbers are kept. Test secrets are built from pieces to avoid GitHub secret scanning."
     ],
     "blockers": [
         "Real ChatGPT and Claude.ai exports not yet tested; the human is waiting for the export emails.",
         "No provider has been tried against a real AI service yet (needs the human's keys or a local Ollama)."
     ],
-    "next_action": "write outputs/scope/closed/T-010.json, then start T-010 (secret hiding). Hook redaction in cli.pack_conversation before render()."
+    "next_action": "write outputs/scope/closed/T-011.json, then start T-011 (end-to-end test, README rewrite, CONTRIBUTING.md)."
 }

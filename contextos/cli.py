@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections import Counter
 from collections.abc import Callable
 from datetime import datetime, timezone
 from pathlib import Path
@@ -258,11 +259,16 @@ def pack_conversation(
         bool,
         typer.Option("--with-transcript", help="Also include the full conversation. Makes the pack much longer."),
     ] = False,
+    no_redact: Annotated[
+        bool,
+        typer.Option("--no-redact", help="Do not hide API keys, private keys, passwords, emails and phone numbers."),
+    ] = False,
 ) -> None:
     """Build a Context Pack from one conversation, so you can continue it in another tool."""
     from contextos.llm import ProviderError
     from contextos.pack import FORMATS, render
     from contextos.pack.builder import PackBuildError, build_pack
+    from contextos.redact import ordered, redact_model
 
     if fmt not in FORMATS:
         typer.echo(f"Error: unknown format '{fmt}'. Choose one of: {', '.join(FORMATS)}.", err=True)
@@ -277,6 +283,17 @@ def pack_conversation(
     def progress(step: str) -> None:
         typer.echo(step, err=True)
 
+    hidden: Counter[str] = Counter()
+    if no_redact:
+        typer.echo(
+            "Warning: hiding is off. The chat is sent to the AI provider as it is, and the pack may "
+            "contain API keys, passwords, emails or phone numbers.",
+            err=True,
+        )
+    else:
+        # Clean the chat before the model sees it.
+        conv = redact_model(conv, hidden)
+
     try:
         provider = get_provider()
         progress(f"Building the pack with {provider.name} ({provider.model}) ...")
@@ -284,6 +301,12 @@ def pack_conversation(
     except (ProviderError, PackBuildError) as exc:
         typer.echo(f"Error: {exc}", err=True)
         raise typer.Exit(code=1) from exc
+
+    if not no_redact:
+        # Check the finished pack again, then record only how many items were hidden.
+        pack = redact_model(pack, hidden).model_copy(update={"redacted": ordered(hidden)})
+        if hidden:
+            progress(f"Hid {sum(hidden.values())} item(s) for privacy.")
 
     text = render(pack, fmt)
     if out is None:

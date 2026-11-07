@@ -111,6 +111,17 @@ you can send the output straight into a file. Add `--with-transcript` to include
 full conversation as well. The `claude-md` section starts with `<!-- contextos:start -->`
 and ends with `<!-- contextos:end -->`, so you can find it and replace it later.
 
+### Hiding secrets
+
+Before the chat is sent to the AI model, ContextOS hides API keys (OpenAI, Anthropic,
+AWS, GitHub), private keys, passwords inside URLs, email addresses and phone numbers.
+Each one becomes a marker such as `[hidden: email]`. The finished pack is checked again
+before it is written. The pack records only how many items of each kind were hidden
+(the `redacted` field), never the hidden text.
+
+`--no-redact` turns this off and prints a warning. Use it only for chats you are sure
+are safe to share.
+
 ## The Context Pack format
 
 A pack is plain JSON with a title, summary, decisions, open questions, next steps, key facts,
