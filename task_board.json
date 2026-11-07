@@ -114,5 +114,14 @@
       "python -m pytest tests/test_mcp_server.py"
     ],
     "status": "done"
+  },
+  {
+    "id": "T-013",
+    "goal": "Make CI fail, instead of skipping, when the MCP server tests cannot run. CI sets CONTEXTOS_REQUIRE_MCP=1; with it set, tests/test_mcp_server.py imports mcp directly, so a missing package is an error. Without it (local runs) the tests still skip as before.",
+    "owner": "builder",
+    "acceptance": [
+      "python -m pytest tests/test_mcp_server.py"
+    ],
+    "status": "done"
   }
 ]

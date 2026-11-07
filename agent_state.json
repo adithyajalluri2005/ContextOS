@@ -2,15 +2,9 @@
     "schema_version": 1,
     "active_task_id": null,
     "touched_files": [
-        "contextos/service.py",
-        "contextos/mcp_server.py",
-        "contextos/cli.py",
-        "contextos/store.py",
-        "pyproject.toml",
+        ".github/workflows/ci.yml",
         "tests/test_mcp_server.py",
-        "tests/test_store.py",
-        "README.md",
-        "outputs/scope/closed/T-012.json",
+        "outputs/scope/closed/T-013.json",
         "task_board.json",
         "agent_state.json"
     ],
@@ -28,11 +22,12 @@
         "T-011: README now opens with a 30-second demo (fixture + fake provider, CONTEXTOS_HOME=demo-home); checked by hand and by tests/test_end_to_end.py, which also runs the demo as a separate process.",
         "T-012: human approved mcp>=2.3 as optional extra contextos[mcp] (also in dev extra for CI). SDK 2.x: mcp.server.mcpserver.MCPServer and mcp.Client (FastMCP was renamed).",
         "T-012: contextos/service.make_pack is the one shared path (redaction + builder) for CLI and MCP. MCP always hides secrets, also in titles and search snippets; no --no-redact over MCP.",
-        "T-012: Store.search: every word must appear in title or a message; LIKE with '!' escape; case-insensitive for English letters only."
+        "T-012: Store.search: every word must appear in title or a message; LIKE with '!' escape; case-insensitive for English letters only.",
+        "T-013: CI sets CONTEXTOS_REQUIRE_MCP=1 on the Tests step; then tests/test_mcp_server.py imports mcp directly, so a missing package fails CI. Locally it still skips. Checked both ways by hiding mcp on purpose."
     ],
     "blockers": [
         "Real ChatGPT and Claude.ai exports not yet tested; the human is waiting for the export emails.",
         "No provider has been tried against a real AI service yet (needs the human's keys or a local Ollama)."
     ],
-    "next_action": "All tasks on the board are done. Ask the human what comes next (real-export testing, a real provider run, or new tasks)."
+    "next_action": "Confirm the CI run for the T-013 push is green. Then ask the human what comes next (real exports, first real provider run, or new tasks)."
 }

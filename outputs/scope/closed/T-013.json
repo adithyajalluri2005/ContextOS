@@ -1,0 +1,26 @@
+{
+  "task_id": "T-013",
+  "goal": "Make CI fail, instead of skipping, when the MCP server tests cannot run. CI sets CONTEXTOS_REQUIRE_MCP=1; with it set, tests/test_mcp_server.py imports mcp directly, so a missing package is an error. Without it (local runs) the tests still skip as before.",
+  "allowed_files": [
+    ".github/workflows/ci.yml",
+    "tests/test_mcp_server.py",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [
+    ".env",
+    "scripts/**",
+    "docs/**",
+    "schemas/**",
+    "pyproject.toml",
+    "contextos/**",
+    "tests/fixtures/**"
+  ],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_mcp_server.py"
+  ],
+  "rollback_plan": "Remove the CONTEXTOS_REQUIRE_MCP env from the Tests step in .github/workflows/ci.yml and restore the plain pytest.importorskip(\"mcp\") line in tests/test_mcp_server.py.",
+  "approvals_required": [
+    "Human asked for this on 2026-11-07 (option 3: make CI prove the MCP tests ran)."
+  ]
+}

@@ -13,7 +13,13 @@ from datetime import datetime, timezone
 
 import pytest
 
-pytest.importorskip("mcp")
+# Locally these tests skip when the optional mcp package is missing. CI sets
+# CONTEXTOS_REQUIRE_MCP=1, so there a missing package fails the run instead of
+# quietly skipping, and a green CI run means these tests really ran.
+if os.environ.get("CONTEXTOS_REQUIRE_MCP") == "1":
+    import mcp  # noqa: F401
+else:
+    pytest.importorskip("mcp")
 
 from mcp import Client  # noqa: E402
 from mcp.client.stdio import StdioServerParameters  # noqa: E402
