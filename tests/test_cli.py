@@ -31,3 +31,25 @@ def test_python_dash_m_works():
     )
     assert result.returncode == 0
     assert __version__ in result.stdout
+
+
+def test_mcp_command_explains_missing_package(monkeypatch):
+    """Without the mcp package, `contextos mcp` says how to install it instead of crashing."""
+    import builtins
+
+    import contextos
+
+    real_import = builtins.__import__
+
+    def fake_import(name, *args, **kwargs):
+        if name == "mcp" or name.startswith("mcp."):
+            raise ModuleNotFoundError(f"No module named '{name}'", name="mcp")
+        return real_import(name, *args, **kwargs)
+
+    # Forget an already loaded server, so the command has to import it again.
+    monkeypatch.delitem(sys.modules, "contextos.mcp_server", raising=False)
+    monkeypatch.delattr(contextos, "mcp_server", raising=False)
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+    result = runner.invoke(app, ["mcp"])
+    assert result.exit_code == 1
+    assert 'pip install "contextos[mcp]"' in result.output

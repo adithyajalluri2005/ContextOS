@@ -31,3 +31,19 @@ def main(
     ] = False,
 ) -> None:
     """Save the context of one AI chat and load it in another."""
+
+
+@app.command("mcp")
+def mcp_command() -> None:
+    """Run the MCP server over stdio, so AI tools can save and load contexts."""
+    try:
+        from contextos import mcp_server
+    except ImportError as exc:
+        if exc.name is None or not exc.name.startswith("mcp"):
+            raise
+        typer.echo(
+            'Error: the MCP server needs an extra package. Install it with: pip install "contextos[mcp]"',
+            err=True,
+        )
+        raise typer.Exit(code=1) from exc
+    mcp_server.run()

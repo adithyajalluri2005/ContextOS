@@ -1,0 +1,22 @@
+{
+  "task_id": "T-005",
+  "goal": "MCP server `contextos mcp` (stdio) with four tools: save_context (hides secrets, then saves), list_contexts (newest first, optional source_tool, limit), search_contexts (every word must appear), load_context (by id, or the newest when no id; markdown or json). Optional extra contextos[mcp].",
+  "allowed_files": [
+    "contextos/mcp_server.py",
+    "contextos/cli.py",
+    "tests/test_mcp_server.py",
+    "tests/test_cli.py",
+    "pyproject.toml",
+    ".github/workflows/ci.yml",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [".env", "scripts/**", "docs/**", "contextos/context.py", "contextos/store.py", "contextos/redact.py"],
+  "acceptance_criteria": [
+    "pip install -e .[dev]",
+    "python -m pytest tests/test_mcp_server.py",
+    "python -m pytest tests"
+  ],
+  "rollback_plan": "Delete contextos/mcp_server.py and tests/test_mcp_server.py; git checkout HEAD -- contextos/cli.py tests/test_cli.py pyproject.toml .github/workflows/ci.yml.",
+  "approvals_required": ["Optional extra contextos[mcp] = mcp>=2.3, also in the dev extra (approved 2026-11-03, confirmed again 2026-11-09)."]
+}

@@ -24,3 +24,6 @@ jobs:
         run: contextos --version
       - name: Tests
         run: python -m pytest tests
+        env:
+          # Fail, do not skip, if the MCP server tests cannot run.
+          CONTEXTOS_REQUIRE_MCP: "1"

@@ -45,9 +45,11 @@
     "goal": "MCP server `contextos mcp` with tools save_context, list_contexts, search_contexts, load_context, using the store and secret hiding.",
     "owner": "builder",
     "acceptance": [
+      "pip install -e .[dev]",
+      "python -m pytest tests/test_mcp_server.py",
       "python -m pytest tests"
     ],
-    "status": "todo"
+    "status": "done"
   },
   {
     "id": "T-006",

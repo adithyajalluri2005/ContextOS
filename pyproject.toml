@@ -25,8 +25,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# The MCP server (`contextos mcp`) needs the MCP package.
+mcp = ["mcp>=2.3"]
 dev = [
   "pytest>=8",
+  "mcp>=2.3",  # so the MCP server tests run in CI
 ]
 
 [project.scripts]
