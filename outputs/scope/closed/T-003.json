@@ -1,0 +1,18 @@
+{
+  "task_id": "T-003",
+  "goal": "Local storage: save, get, list (newest first, optional source tool filter), search (every word must appear, case-insensitive) and delete contexts in one SQLite file under CONTEXTOS_HOME (default ~/.contextos/contextos.db).",
+  "allowed_files": [
+    "contextos/store.py",
+    "tests/test_store.py",
+    "tests/conftest.py",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [".env", "scripts/**", "docs/**", "pyproject.toml", "contextos/context.py", "contextos/cli.py"],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_store.py",
+    "python -m pytest tests"
+  ],
+  "rollback_plan": "Delete contextos/store.py, tests/test_store.py and tests/conftest.py.",
+  "approvals_required": []
+}

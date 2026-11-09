@@ -25,9 +25,10 @@
     "goal": "Local storage: save, list, search, load and delete contexts in one SQLite file under CONTEXTOS_HOME (default ~/.contextos).",
     "owner": "builder",
     "acceptance": [
+      "python -m pytest tests/test_store.py",
       "python -m pytest tests"
     ],
-    "status": "todo"
+    "status": "done"
   },
   {
     "id": "T-004",

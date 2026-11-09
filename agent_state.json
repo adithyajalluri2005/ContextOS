@@ -2,8 +2,9 @@
   "schema_version": 1,
   "active_task_id": null,
   "touched_files": [
-    "contextos/context.py",
-    "tests/test_context.py",
+    "contextos/store.py",
+    "tests/test_store.py",
+    "tests/conftest.py",
     "task_board.json",
     "agent_state.json"
   ],
@@ -12,8 +13,9 @@
     "Old export-based design is kept in git: tag v0-export-design and branch old/export-design. Old task files are in outputs/archive/v0/.",
     "Human wants a reading list of files after every task, and a stop after each task to read them.",
     "Approved runtime dependencies: typer, pydantic. mcp>=2.3 as optional extra contextos[mcp] (approved 2026-11-03 planning).",
-    "T-002: contextos/context.py has Context (title and summary required; lists of decisions, open_questions, next_steps, key_facts; files as FileRef(path, note); code as CodeSnippet(content, language, note); source_tool, project_dir, created_at in UTC; id set by the store). Unknown fields are refused (extra=forbid). to_markdown() leaves out empty sections. A `redacted` count field is planned for T-004."
+    "T-002: contextos/context.py has Context (title and summary required; lists of decisions, open_questions, next_steps, key_facts; files as FileRef(path, note); code as CodeSnippet(content, language, note); source_tool, project_dir, created_at in UTC; id set by the store). Unknown fields are refused (extra=forbid). to_markdown() leaves out empty sections. A `redacted` count field is planned for T-004.",
+    "T-003: contextos/store.py Store(path=None) uses $CONTEXTOS_HOME/contextos.db or ~/.contextos/contextos.db. Methods: save (always a new entry, ids are '1','2',...), get, recent(limit, source_tool) newest first, search(query) every word must appear in any content field (not the fixed Markdown header), case-insensitive also beyond English, delete. Method is `recent`, not `list`, because `list` hides the built-in type inside the class. tests/conftest.py gives every test its own CONTEXTOS_HOME."
   ],
   "blockers": [],
-  "next_action": "Human reads the T-002 files. Then T-003 (local SQLite storage)."
+  "next_action": "Human reads the T-003 files. Then T-004 (secret hiding)."
 }
