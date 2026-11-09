@@ -1,0 +1,19 @@
+{
+  "task_id": "T-004",
+  "goal": "Secret hiding: replace API keys (Anthropic, OpenAI, AWS, GitHub), private keys, passwords in URLs, emails and phone numbers with markers like [hidden: email] in every text field of a context before it is saved. Keep only the count per kind in a new optional Context field `redacted`, and mention it in the Markdown view.",
+  "allowed_files": [
+    "contextos/redact.py",
+    "contextos/context.py",
+    "tests/test_redact.py",
+    "tests/test_context.py",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [".env", "scripts/**", "docs/**", "pyproject.toml", "contextos/store.py", "contextos/cli.py"],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_redact.py",
+    "python -m pytest tests"
+  ],
+  "rollback_plan": "Delete contextos/redact.py and tests/test_redact.py; git checkout HEAD -- contextos/context.py tests/test_context.py.",
+  "approvals_required": []
+}

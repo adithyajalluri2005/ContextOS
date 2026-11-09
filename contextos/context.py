@@ -63,6 +63,10 @@ class Context(BaseModel):
     project_dir: str | None = None
     created_at: datetime = Field(default_factory=_now)
 
+    # How many secrets of each kind were hidden, for example {"email": 2}.
+    # {} = checked, nothing found. None = not checked.
+    redacted: dict[str, int] | None = None
+
     @field_validator("title", "summary", mode="before")
     @classmethod
     def _strip_text(cls, value: object) -> object:
@@ -92,6 +96,15 @@ class Context(BaseModel):
             origin.append(f"in `{self.project_dir}`")
         lines += [
             f"> {' '.join(origin)}. This is the context of earlier work. Continue from here.",
+        ]
+        if self.redacted:
+            hidden = ", ".join(f"{count} {kind}" for kind, count in self.redacted.items())
+            lines += [
+                ">",
+                f"> Hidden for safety: {hidden}. Markers like `[hidden: email]` show where."
+                " Ask the user if you need the real value.",
+            ]
+        lines += [
             "",
             "## Summary",
             "",

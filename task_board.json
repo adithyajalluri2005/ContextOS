@@ -35,9 +35,10 @@
     "goal": "Secret hiding: replace API keys, private keys, passwords in URLs, emails and phone numbers with markers like [hidden: email] before a context is saved; keep only counts.",
     "owner": "builder",
     "acceptance": [
+      "python -m pytest tests/test_redact.py",
       "python -m pytest tests"
     ],
-    "status": "todo"
+    "status": "done"
   },
   {
     "id": "T-005",
