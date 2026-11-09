@@ -1,0 +1,28 @@
+{
+  "task_id": "T-001",
+  "goal": "Set up the new project: a pyproject.toml, a contextos/ Python package, a Typer command-line entry point named `contextos` with a --version flag, a tests/ folder, and a GitHub Actions CI file that runs the tests.",
+  "allowed_files": [
+    "pyproject.toml",
+    "contextos/**",
+    "tests/**",
+    ".github/workflows/ci.yml",
+    "README.md",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [
+    ".env",
+    "scripts/**",
+    "schemas/**",
+    "docs/**"
+  ],
+  "acceptance_criteria": [
+    "pip install -e .[dev]",
+    "contextos --version",
+    "python -m pytest tests"
+  ],
+  "rollback_plan": "Delete pyproject.toml, contextos/, tests/ and .github/workflows/ci.yml.",
+  "approvals_required": [
+    "New runtime dependencies typer and pydantic (approved by the human in the planning chat on 2026-11-03)"
+  ]
+}

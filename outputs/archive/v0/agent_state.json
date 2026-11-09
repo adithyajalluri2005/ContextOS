@@ -1,0 +1,38 @@
+{
+    "schema_version": 1,
+    "active_task_id": null,
+    "touched_files": [
+        "contextos/llm/ollama_provider.py",
+        "tests/test_ollama_cloud.py",
+        "tests/conftest.py",
+        ".env.example",
+        "README.md",
+        "outputs/scope/closed/T-014.json",
+        "task_board.json",
+        "agent_state.json"
+    ],
+    "assumptions": [
+        "Human approved anthropic and openai as optional extras only (contextos[anthropic], contextos[openai]). Ollama uses urllib. CI installs .[dev] only; the 3 tests that need the real packages skip there.",
+        "Provider.complete(system, prompt, schema=None) -> str. get_provider() reads CONTEXTOS_PROVIDER (anthropic|openai|ollama|fake) and CONTEXTOS_MODEL. Keys come only from ANTHROPIC_API_KEY / OPENAI_API_KEY and are passed explicitly to the client.",
+        "Anthropic: default claude-opus-5-5, client.beta.messages.create, effort medium, output_config.format json_schema, fallbacks='default' with beta server-side-fallback-2026-07-01 (only on fable-5-1/opus-5-5/opus-5/sonnet-5-5). Checked against anthropic 2.4.0 signatures; never called for real.",
+        "OpenAI: default gpt-5 (not checked against a live account), chat.completions with strict json_schema. Ollama: default llama3.1, /api/chat, format=schema, num_ctx 16384.",
+        "Builder (contextos/pack/builder.py): one request if the chat fits provider.max_input_chars - 4000; else parts split on message boundaries, notes per part, then merged in rounds (each round at least halves). One retry on unusable JSON, then PackBuildError. Title: model's title, else original title, else 'Untitled conversation'.",
+        "build_pack(..., progress=callback) gives step messages for the CLI in T-009.",
+        "T-009: renderers in contextos/pack/render.py (markdown, json, claude-md); they only format, empty sections left out. claude-md section is wrapped in <!-- contextos:start --> / <!-- contextos:end --> with ### headings.",
+        "T-009: `contextos pack ID [-o FILE] [-f markdown|json|claude-md] [--with-transcript]`. Progress and errors go to stderr; pack goes to stdout or the file. cli.get_provider() is a small wrapper so tests can replace it.",
+        "T-010: contextos/redact.py. The chat is cleaned before it goes to the model, and the finished pack is cleaned again. Markers look like [hidden: email]. New optional pack field `redacted` (kind -> count); {} = ran, found nothing; missing = --no-redact. Schema file and SPEC.md updated.",
+        "T-010: phone numbers need 10-15 digits plus a separator or a leading +; dates, IPs and plain long numbers are kept. Test secrets are built from pieces to avoid GitHub secret scanning.",
+        "T-011: README now opens with a 30-second demo (fixture + fake provider, CONTEXTOS_HOME=demo-home); checked by hand and by tests/test_end_to_end.py, which also runs the demo as a separate process.",
+        "T-012: human approved mcp>=2.3 as optional extra contextos[mcp] (also in dev extra for CI). SDK 2.x: mcp.server.mcpserver.MCPServer and mcp.Client (FastMCP was renamed).",
+        "T-012: contextos/service.make_pack is the one shared path (redaction + builder) for CLI and MCP. MCP always hides secrets, also in titles and search snippets; no --no-redact over MCP.",
+        "T-012: Store.search: every word must appear in title or a message; LIKE with '!' escape; case-insensitive for English letters only.",
+        "T-013: CI sets CONTEXTOS_REQUIRE_MCP=1 on the Tests step; then tests/test_mcp_server.py imports mcp directly, so a missing package fails CI. Locally it still skips. Checked both ways by hiding mcp on purpose.",
+        "T-014: OLLAMA_API_KEY switches the ollama provider to https://ollama.com with a Bearer token; default cloud model gpt-oss:120b is NOT yet checked against the live model list. Key never sent over plain http to a non-local host. tests/conftest.py removes all real AI keys and settings from every test.",
+        "The human pasted a Groq key and an Ollama key in chat on 2026-11-07; both were told to delete and replace them. Neither was used or stored."
+    ],
+    "blockers": [
+        "Real ChatGPT and Claude.ai exports not yet tested; the human is waiting for the export emails.",
+        "No provider has been tried against a real AI service yet (needs the human's keys or a local Ollama)."
+    ],
+    "next_action": "After Claude Code restarts with OLLAMA_API_KEY set: check the cloud model list, then make the first real pack from the demo fixture chat (CONTEXTOS_PROVIDER=ollama). T-014 is not committed yet."
+}

@@ -1,6 +1,5 @@
-"""Allow `python -m contextos`."""
+"""Lets you run `python -m contextos`."""
 
 from contextos.cli import app
 
-if __name__ == "__main__":
-    app(prog_name="contextos")
+app()
