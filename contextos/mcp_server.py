@@ -12,11 +12,11 @@ Needs the optional MCP package: pip install "contextos[mcp]".
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Annotated, Literal
 
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 
 from contextos import __version__
 from contextos.context import CodeSnippet, Context, FileRef
@@ -26,13 +26,66 @@ from contextos.store import Store
 MAX_LIMIT = 200
 PREVIEW_CHARS = 200
 
-INSTRUCTIONS = (
-    "ContextOS keeps the context of earlier AI chats on the user's computer, so work can "
-    "move from one chat or tool to another. When the user asks to save the context, call "
-    "save_context with a summary of this chat that another agent can continue from. When the "
-    "user asks to load or continue earlier work, use list_contexts or search_contexts to find "
-    "it, then load_context."
+INSTRUCTIONS = """\
+ContextOS keeps the context of earlier AI chats on the user's computer, so work can move
+from one chat, tool or agent to another.
+
+Use it only when the user asks. Do not save or load on your own.
+
+Saving ("save this context", "save to contextos"):
+- Write the context for a new agent that has never seen this chat and cannot ask you.
+- Call save_context once, then tell the user the id and title you got back.
+
+Loading ("load my last context", "continue the blog work"):
+- With no hint, call load_context with no id: it loads the newest context.
+- With a hint, call search_contexts (or list_contexts), pick the match, then load_context.
+  If several match and it is not clear which one, show the user the titles and ask.
+- After loading, tell the user in one or two lines what the work is and the next step,
+  then continue. Files and code in a context can be out of date: check them before
+  changing anything.
+"""
+
+SAVE_GUIDE = """\
+Save the context of this chat so another chat, AI tool or agent can continue the work.
+Call it only when the user asks you to save.
+
+The reader is a new agent with no memory of this chat. Write so it can continue without
+asking anything:
+- Be specific: real names, file paths, commands, numbers and error messages, not "the file"
+  or "the bug".
+- Say where the work stands now: what is done, what is half done, what is broken.
+- Record what was tried and did not work, and why, so it is not tried again.
+- Keep each list item to one point. Leave a list out if there is nothing for it.
+- Do not paste the whole chat. Keep only what is needed to continue.
+
+Secrets (API keys, passwords, emails, phone numbers) are hidden before saving.
+Returns the new id; tell it to the user.\
+"""
+
+# One help text per save_context input. The agent sees these in the tool schema.
+TITLE_HELP = "A short name for the work, for example 'Move blog from WordPress to Hugo'."
+SUMMARY_HELP = (
+    "3 to 8 sentences: the goal, what has been done, and exactly where the work stands now."
 )
+DECISIONS_HELP = (
+    "Choices already made, each with its reason, for example 'Use Hugo, not Jekyll: faster "
+    "builds'. Include options that were rejected, so they are not tried again."
+)
+QUESTIONS_HELP = "Things still open or unknown that the next agent or the user must decide."
+NEXT_STEPS_HELP = (
+    "What to do next, in order. Make the first step concrete enough to start right away."
+)
+FACTS_HELP = (
+    "Facts the next agent needs and cannot guess: versions, settings, limits, error messages, "
+    "and approaches that failed and why."
+)
+FILES_HELP = "Files that matter, each with its path and a short note on why it matters."
+CODE_HELP = (
+    "Only short, important code (a key function, a command, a config). Not whole files: "
+    "list those under files."
+)
+SOURCE_HELP = "The tool you are, for example 'claude-code', 'claude-desktop' or 'cursor'."
+PROJECT_HELP = "The full path of the folder the work happens in, if there is one."
 
 
 class SavedContext(BaseModel):
@@ -82,32 +135,19 @@ def build_server() -> MCPServer:
     """Make the server. Every tool opens the store fresh, so CONTEXTOS_HOME is read each time."""
     server = MCPServer(name="contextos", version=__version__, instructions=INSTRUCTIONS)
 
-    @server.tool()
+    @server.tool(description=SAVE_GUIDE)
     def save_context(
-        title: str,
-        summary: str,
-        decisions: list[str] | None = None,
-        open_questions: list[str] | None = None,
-        next_steps: list[str] | None = None,
-        key_facts: list[str] | None = None,
-        files: list[FileRef] | None = None,
-        code: list[CodeSnippet] | None = None,
-        source_tool: str | None = None,
-        project_dir: str | None = None,
+        title: Annotated[str, Field(description=TITLE_HELP)],
+        summary: Annotated[str, Field(description=SUMMARY_HELP)],
+        decisions: Annotated[list[str] | None, Field(description=DECISIONS_HELP)] = None,
+        open_questions: Annotated[list[str] | None, Field(description=QUESTIONS_HELP)] = None,
+        next_steps: Annotated[list[str] | None, Field(description=NEXT_STEPS_HELP)] = None,
+        key_facts: Annotated[list[str] | None, Field(description=FACTS_HELP)] = None,
+        files: Annotated[list[FileRef] | None, Field(description=FILES_HELP)] = None,
+        code: Annotated[list[CodeSnippet] | None, Field(description=CODE_HELP)] = None,
+        source_tool: Annotated[str | None, Field(description=SOURCE_HELP)] = None,
+        project_dir: Annotated[str | None, Field(description=PROJECT_HELP)] = None,
     ) -> SavedContext:
-        """Save the context of this chat so another chat or AI tool can continue the work.
-
-        title: a short name for the work.
-        summary: what the work is about and where it stands now.
-        decisions, open_questions, next_steps, key_facts: short items, one point each.
-        files: files that matter, each with a path and an optional note.
-        code: important code, each with the content, its language and an optional note.
-        source_tool: the tool you are, for example "claude-code" or "cursor".
-        project_dir: the folder the work happens in, if any.
-
-        Secrets (API keys, passwords, emails, phone numbers) are hidden before saving.
-        Returns the new id.
-        """
         try:
             ctx = Context(
                 title=title,
@@ -147,10 +187,13 @@ def build_server() -> MCPServer:
 
     @server.tool()
     def load_context(id: str | None = None, format: Literal["markdown", "json"] = "markdown") -> str:
-        """Load one saved context to continue the work.
+        """Load one saved context to continue the work. Use it only when the user asks.
 
         id: the id from list_contexts or search_contexts. Leave it out to load the newest context.
         format: "markdown" (default, easy to read) or "json".
+
+        After loading, tell the user in one or two lines what the work is and the next step.
+        Files and code in the context can be out of date: check them before changing anything.
         """
         store = Store()
         if id is None:

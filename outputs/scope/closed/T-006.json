@@ -1,0 +1,17 @@
+{
+  "task_id": "T-006",
+  "goal": "Tool instructions: the server instructions and tool descriptions tell the calling agent (1) to save or load only when the user asks, (2) how to write a context that a new agent with no memory of the chat can continue from, and (3) what to do after loading. Every save_context input gets its own description in the tool schema.",
+  "allowed_files": [
+    "contextos/mcp_server.py",
+    "tests/test_mcp_server.py",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [".env", "scripts/**", "docs/**", "pyproject.toml", "contextos/context.py", "contextos/store.py", "contextos/redact.py", "contextos/cli.py"],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_mcp_server.py",
+    "python -m pytest tests"
+  ],
+  "rollback_plan": "git checkout HEAD -- contextos/mcp_server.py tests/test_mcp_server.py",
+  "approvals_required": []
+}

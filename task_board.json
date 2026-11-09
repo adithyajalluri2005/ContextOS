@@ -56,9 +56,10 @@
     "goal": "Tool instructions: the MCP tool descriptions tell the calling agent how to write a good context and to save only when the user asks.",
     "owner": "builder",
     "acceptance": [
+      "python -m pytest tests/test_mcp_server.py",
       "python -m pytest tests"
     ],
-    "status": "todo"
+    "status": "done"
   },
   {
     "id": "T-007",

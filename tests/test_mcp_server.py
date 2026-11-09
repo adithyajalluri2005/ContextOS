@@ -89,6 +89,48 @@ def test_server_offers_four_tools_with_descriptions():
     assert "save_context" in instructions and "load_context" in instructions
 
 
+def tools_and_instructions():
+    async def go():
+        async with Client(build_server()) as client:
+            tools = (await client.list_tools()).tools
+            return {t.name: t for t in tools}, client.instructions
+
+    return asyncio.run(go())
+
+
+def test_instructions_say_use_only_when_the_user_asks():
+    tools, instructions = tools_and_instructions()
+    assert "only when the user asks" in instructions
+    assert "Do not save or load on your own" in instructions
+    assert "only when the user asks" in tools["save_context"].description
+    assert "only when the user asks" in tools["load_context"].description.lower()
+
+
+def test_instructions_explain_loading_steps():
+    _, instructions = tools_and_instructions()
+    assert "load_context with no id" in instructions
+    assert "search_contexts" in instructions
+    assert "out of date" in instructions
+
+
+def test_save_guide_is_written_for_a_reader_with_no_memory():
+    description = tools_and_instructions()[0]["save_context"].description
+    for phrase in ("no memory of this chat", "Be specific", "tried and did not work", "tell it to the user"):
+        assert phrase in description
+
+
+def test_every_save_input_has_its_own_description():
+    schema = tools_and_instructions()[0]["save_context"].input_schema
+    properties = schema["properties"]
+    assert set(properties) == {
+        "title", "summary", "decisions", "open_questions", "next_steps",
+        "key_facts", "files", "code", "source_tool", "project_dir",
+    }
+    for name, prop in properties.items():
+        assert len(prop.get("description", "")) > 20, name
+    assert "rejected" in properties["decisions"]["description"]
+
+
 # --- save_context --------------------------------------------------------------
 
 
