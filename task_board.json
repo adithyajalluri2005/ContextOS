@@ -15,9 +15,10 @@
     "goal": "Context format: a Pydantic model for one saved context (title, summary, decisions, open questions, next steps, key facts, files, code, source tool, created time) and a Markdown renderer.",
     "owner": "builder",
     "acceptance": [
+      "python -m pytest tests/test_context.py",
       "python -m pytest tests"
     ],
-    "status": "todo"
+    "status": "done"
   },
   {
     "id": "T-003",

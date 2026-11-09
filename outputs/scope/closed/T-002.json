@@ -1,0 +1,17 @@
+{
+  "task_id": "T-002",
+  "goal": "Context format: a Pydantic model for one saved context (title, summary, decisions, open questions, next steps, key facts, files, code, source tool, project folder, created time) and a Markdown renderer that the next agent can read.",
+  "allowed_files": [
+    "contextos/context.py",
+    "tests/test_context.py",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [".env", "scripts/**", "docs/**", "pyproject.toml", "contextos/cli.py"],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_context.py",
+    "python -m pytest tests"
+  ],
+  "rollback_plan": "Delete contextos/context.py and tests/test_context.py.",
+  "approvals_required": []
+}
