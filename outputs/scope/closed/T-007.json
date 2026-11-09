@@ -1,0 +1,17 @@
+{
+  "task_id": "T-007",
+  "goal": "README: what ContextOS does, install, setup for Claude Code, Claude Desktop and Cursor, how to save in chat A and load in chat B, what is hidden, where data lives, limits (web apps need a hosted server). A test checks the README names the real tools and commands.",
+  "allowed_files": [
+    "README.md",
+    "tests/test_readme.py",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [".env", "scripts/**", "docs/**", "pyproject.toml", "contextos/**"],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_readme.py",
+    "python -m pytest tests"
+  ],
+  "rollback_plan": "git checkout HEAD -- README.md; delete tests/test_readme.py.",
+  "approvals_required": []
+}

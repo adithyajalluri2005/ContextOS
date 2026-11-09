@@ -66,9 +66,10 @@
     "goal": "README: what ContextOS does, setup for Claude Code, Claude Desktop and Cursor, and a demo of chat A saving and chat B loading.",
     "owner": "builder",
     "acceptance": [
+      "python -m pytest tests/test_readme.py",
       "python -m pytest tests"
     ],
-    "status": "todo"
+    "status": "done"
   },
   {
     "id": "T-008",
