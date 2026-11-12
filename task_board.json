@@ -88,5 +88,14 @@
       "python -m pytest tests"
     ],
     "status": "done"
+  },
+  {
+    "id": "T-010",
+    "goal": "contextos list and show write UTF-8, so non-English text does not crash on Windows when output is redirected.",
+    "owner": "builder",
+    "acceptance": [
+      "python -m pytest tests"
+    ],
+    "status": "done"
   }
 ]

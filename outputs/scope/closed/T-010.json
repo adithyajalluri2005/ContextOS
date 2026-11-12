@@ -1,0 +1,17 @@
+{
+  "task_id": "T-010",
+  "goal": "contextos list and show write UTF-8 on every system, so text outside cp1252 (Japanese, emoji) does not crash on Windows when output goes to a file or pipe. Test runs the real program with redirected output.",
+  "allowed_files": [
+    "contextos/cli.py",
+    "tests/test_cli.py",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [".env", "scripts/**", "docs/**", "pyproject.toml", "contextos/store.py", "contextos/mcp_server.py"],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_cli.py",
+    "python -m pytest tests"
+  ],
+  "rollback_plan": "git checkout HEAD -- contextos/cli.py tests/test_cli.py.",
+  "approvals_required": []
+}

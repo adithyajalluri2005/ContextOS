@@ -1,5 +1,6 @@
 """The `contextos` command line."""
 
+import sys
 from typing import Annotated
 
 import typer
@@ -32,6 +33,19 @@ def main(
     ] = False,
 ) -> None:
     """Save the context of one AI chat and load it in another."""
+    _use_utf8_output()
+
+
+def _use_utf8_output() -> None:
+    """Write UTF-8, so any language prints and nothing crashes.
+
+    On Windows, output sent to a file or a pipe uses the old cp1252 code page, which cannot
+    hold Japanese text or emoji and raises UnicodeEncodeError.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)  # test runners may swap the stream
+        if reconfigure is not None:
+            reconfigure(encoding="utf-8")
 
 
 @app.command("mcp")

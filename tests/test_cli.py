@@ -1,6 +1,7 @@
 """Tests for the `contextos` command line."""
 
 import json
+import os
 import subprocess
 import sys
 
@@ -131,3 +132,23 @@ def test_delete_unknown_id():
     result = runner.invoke(app, ["delete", "abc", "--yes"])
     assert result.exit_code == 1
     assert "no context with id 'abc'" in result.output
+
+
+def test_list_and_show_print_any_language_when_output_is_redirected():
+    """Windows sends piped output as cp1252, which cannot hold Japanese or emoji.
+
+    PYTHONIOENCODING=cp1252 makes every system behave like that, so this test fails
+    everywhere if the command line stops writing UTF-8.
+    """
+    ctx = _save(title="Notes 日本語 ✅ – done", summary="Made-up: emoji 🎉 and Ελληνικά.")
+    env = {**os.environ, "PYTHONIOENCODING": "cp1252"}
+    for args in (["list"], ["show", ctx.id], ["show", ctx.id, "--json"]):
+        result = subprocess.run(
+            [sys.executable, "-m", "contextos", *args], capture_output=True, env=env, check=False
+        )
+        assert result.returncode == 0, result.stderr.decode("utf-8", "replace")
+        out = result.stdout.decode("utf-8")
+        if args[-1] == "--json":
+            assert json.loads(out)["title"] == ctx.title
+        else:
+            assert "Notes 日本語 ✅ – done" in out
