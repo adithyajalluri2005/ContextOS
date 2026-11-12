@@ -51,3 +51,15 @@ def test_readme_json_examples_are_valid():
     for block in blocks:
         config = json.loads(block)
         assert config["mcpServers"]["contextos"]["args"] == ["mcp"]
+
+
+def test_readme_explains_serve_with_the_real_options():
+    assert "contextos serve --public-host" in README
+    assert "--new-secret" in README
+    assert "CONTEXTOS_SECRET" in README
+    assert "secret.txt" in README
+    assert "8765" in README
+    from contextos import mcp_server
+
+    assert mcp_server.SECRET_ENV == "CONTEXTOS_SECRET"
+    assert mcp_server.SECRET_FILE == "secret.txt"

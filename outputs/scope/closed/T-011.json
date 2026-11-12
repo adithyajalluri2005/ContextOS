@@ -1,0 +1,20 @@
+{
+  "task_id": "T-011",
+  "goal": "contextos serve: run the MCP server over HTTP on 127.0.0.1 so a tunnel (ngrok fixed domain) can put it on the internet. Protection by secret link: the only working path is /<secret>/mcp, everything else is 404. The secret comes from CONTEXTOS_SECRET or a file next to the database, made on first run (token_urlsafe(32)); --new-secret replaces it. --public-host adds the tunnel domain to the allowed Host headers. Access logs are off so the secret is never written to logs. README explains setup with ngrok and claude.ai / ChatGPT connectors.",
+  "allowed_files": [
+    "contextos/cli.py",
+    "contextos/mcp_server.py",
+    "tests/test_http_server.py",
+    "tests/test_readme.py",
+    "README.md",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [".env", "scripts/**", "docs/**", "pyproject.toml", "contextos/store.py", "contextos/redact.py"],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_http_server.py",
+    "python -m pytest tests"
+  ],
+  "rollback_plan": "git checkout HEAD -- contextos README.md tests; delete tests/test_http_server.py.",
+  "approvals_required": ["Human chose secret-link protection on 2026-11-12."]
+}

@@ -2,9 +2,12 @@
   "schema_version": 1,
   "active_task_id": null,
   "touched_files": [
+    "contextos/mcp_server.py",
     "contextos/cli.py",
-    "tests/test_cli.py",
-    "outputs/scope/closed/T-010.json",
+    "tests/test_http_server.py",
+    "tests/test_readme.py",
+    "README.md",
+    "outputs/scope/closed/T-011.json",
     "task_board.json",
     "agent_state.json"
   ],
@@ -21,8 +24,9 @@
     "T-007: README rewritten for the MCP design: install from the folder with pip install -e .[mcp], use the full path of the contextos program (CONTEXTOS_PATH) in Claude Code (claude mcp add --scope user), Claude Desktop (claude_desktop_config.json mcpServers) and Cursor (~/.cursor/mcp.json). Setup steps for Claude Desktop and Cursor are written from known config formats and were NOT tried on this machine. tests/test_readme.py checks the tool table matches the real tools, every field is named, and the JSON example is valid.",
     "T-008: cli.py adds `contextos list` (newest first, --limit/-n, --source; 80-char one-line preview), `show ID` (Markdown, --json), `delete ID` (asks y/N, --yes/-y skips; refusing exits 1). Unknown id -> error on stderr, exit 1. README 'Use it' has a short terminal example. No task after T-008 on the board yet.",
     "T-009: real-agent trial with claude -p, temp MCP config, throwaway CONTEXTOS_HOME. Save, load in another folder, file check before changing, and secret hiding all worked. Found: (1) contextos list/show crash with UnicodeEncodeError on Windows when output is redirected and text is outside cp1252 (T-008 bug, fix in cli.py); (2) user@host after :// is hidden as email. Report: outputs/trials/T-009.md. ContextOS is not registered in the user's Claude Code; context-manager and 'claude.ai Context OS' are other/old servers.",
-    "T-010: cli.py main callback calls _use_utf8_output(), which reconfigures stdout and stderr to UTF-8 (skipped when a test runner swaps the stream). Test runs the real program with PYTHONIOENCODING=cp1252 so it fails on every OS if this breaks; confirmed it fails without the fix."
+    "T-010: cli.py main callback calls _use_utf8_output(), which reconfigures stdout and stderr to UTF-8 (skipped when a test runner swaps the stream). Test runs the real program with PYTHONIOENCODING=cp1252 so it fails on every OS if this breaks; confirmed it fails without the fix.",
+    "T-011: `contextos serve [--public-host H] [--port 8765] [--new-secret]` runs MCP over streamable HTTP (stateless, JSON answers) on 127.0.0.1 via uvicorn with access_log off. Only /<secret>/mcp works, rest 404. Secret: $CONTEXTOS_SECRET, else secret.txt next to the DB, made with token_urlsafe(32); min 32 chars [A-Za-z0-9_-]. --public-host is added to the MCP Host/Origin allow-list (needed or tunnel requests are refused). Tried live through the user's fixed ngrok domain with a throwaway DB: right link 200, wrong/no secret 404, save works, secret not in serve or ngrok logs. Human chose secret-link protection (no OAuth)."
   ],
   "blockers": [],
-  "next_action": "Human reads the T-010 files. Open items from T-009: user@host after :// hidden as email (redact.py); ContextOS not yet registered in the user's Claude Code."
+  "next_action": "Human reads the T-011 files and decides: commit; start serve + ngrok for real; update the claude.ai connector to the new link; maybe auto-start at login."
 }

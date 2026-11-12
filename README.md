@@ -89,6 +89,47 @@ the same `mcpServers` block as for Claude Desktop.
 Any tool that can start a local MCP server over stdio works. The command is
 `CONTEXTOS_PATH` with the argument `mcp`.
 
+### claude.ai and ChatGPT (websites)
+
+The websites cannot start a program on your computer. They can only reach an MCP server
+on the internet. `contextos serve` runs ContextOS as a small web server on your computer,
+and a tunnel such as [ngrok](https://ngrok.com) gives it a public address.
+
+**Protection is a secret link.** The only address that works is
+`https://<your-address>/<secret>/mcp`. Every other address answers "not found". The secret
+is a long random code, made on first run and kept in `secret.txt` next to the database.
+Anyone who has the full link can read and change all your contexts, so keep it private.
+
+1. Get a fixed address. A free ngrok account includes one, shown in the ngrok dashboard
+   under **Domains**, for example `your-name.ngrok-free.dev`. It does not change.
+2. Start ContextOS, with your address:
+
+   ```
+   contextos serve --public-host your-name.ngrok-free.dev
+   ```
+
+   It prints the link to use, `https://your-name.ngrok-free.dev/<secret>/mcp`.
+3. In a second terminal, start the tunnel to the same port (8765 by default):
+
+   ```
+   ngrok http --url=your-name.ngrok-free.dev 8765
+   ```
+
+4. Add the link as a custom connector: in claude.ai under **Settings → Connectors → Add
+   custom connector**; in ChatGPT under **Settings → Apps & Connectors** (custom connectors
+   may need **Developer mode** turned on). Menu names change from time to time.
+
+Good to know:
+
+- It works only while your computer is on and both programs run.
+- The link stays the same after a restart. To change it (for example if someone saw it),
+  run `contextos serve --new-secret ...`, then update the connector with the new link.
+- `CONTEXTOS_SECRET` set in the environment is used instead of `secret.txt`.
+- ContextOS listens on `127.0.0.1` only and writes no request logs, so the secret is not
+  written to a log. The tunnel company (ngrok) handles your traffic and can see it.
+- The websites and your local apps (Claude Code, Claude Desktop) share the same saved
+  contexts.
+
 ## Use it
 
 **Save**, in the chat you want to leave:
@@ -150,8 +191,8 @@ the file.
 
 ## Limits
 
-- **Web apps:** the claude.ai and chatgpt.com websites can only reach MCP servers on the
-  internet, not on your computer. Use the desktop apps or a coding tool for now.
+- **Websites:** claude.ai and chatgpt.com need `contextos serve` and a tunnel (see above),
+  and your computer must be on. Protection is a secret link only, not a login.
 - The quality of a context depends on the agent that writes it. ContextOS tells the agent
   what a good context holds, but it cannot check that the summary is right.
 - Files and code in a context show the state at saving time. The loading agent is told to

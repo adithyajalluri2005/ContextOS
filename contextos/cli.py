@@ -48,9 +48,8 @@ def _use_utf8_output() -> None:
             reconfigure(encoding="utf-8")
 
 
-@app.command("mcp")
-def mcp_command() -> None:
-    """Run the MCP server over stdio, so AI tools can save and load contexts."""
+def _load_mcp_server():
+    """Import the MCP server, or explain how to install the package it needs."""
     try:
         from contextos import mcp_server
     except ImportError as exc:
@@ -61,7 +60,47 @@ def mcp_command() -> None:
             err=True,
         )
         raise typer.Exit(code=1) from exc
-    mcp_server.run()
+    return mcp_server
+
+
+@app.command("mcp")
+def mcp_command() -> None:
+    """Run the MCP server over stdio, so AI tools can save and load contexts."""
+    _load_mcp_server().run()
+
+
+@app.command("serve")
+def serve_command(
+    public_host: Annotated[
+        str | None,
+        typer.Option(
+            "--public-host",
+            help="The tunnel's domain, for example name.ngrok-free.dev. Without it, only "
+            "this computer can connect.",
+        ),
+    ] = None,
+    port: Annotated[int, typer.Option("--port", min=1, max=65535, help="Local port.")] = 8765,
+    new_secret: Annotated[
+        bool,
+        typer.Option("--new-secret", help="Make a new secret. The old link stops working."),
+    ] = False,
+) -> None:
+    """Run the MCP server over HTTP behind a secret link, for web apps through a tunnel."""
+    mcp_server = _load_mcp_server()
+    try:
+        secret = mcp_server.load_secret(renew=new_secret)
+    except ValueError as exc:
+        typer.echo(f"Error: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+    if public_host:
+        public_host = public_host.removeprefix("https://").removeprefix("http://").strip("/")
+    path = mcp_server.mcp_path(secret)
+    typer.echo(f"ContextOS is running on this computer: http://127.0.0.1:{port}{path}")
+    if public_host:
+        typer.echo(f"Link for claude.ai or ChatGPT:        https://{public_host}{path}")
+    typer.echo("Keep the link private: anyone who has it can read and change your contexts.")
+    typer.echo("Stop with Ctrl+C.")
+    mcp_server.serve(secret, port=port, public_host=public_host)
 
 
 PREVIEW_CHARS = 80
