@@ -2,10 +2,8 @@
   "schema_version": 1,
   "active_task_id": null,
   "touched_files": [
-    "contextos/cli.py",
-    "tests/test_cli.py",
-    "README.md",
-    "outputs/scope/closed/T-008.json",
+    "outputs/trials/T-009.md",
+    "outputs/scope/closed/T-009.json",
     "task_board.json",
     "agent_state.json"
   ],
@@ -20,8 +18,9 @@
     "T-005: contextos/mcp_server.py build_server() with tools save_context (Context -> redact_context -> Store.save; returns id, title, redacted; bad input -> ToolError, nothing saved), list_contexts(source_tool, limit 1-200), search_contexts(query; empty -> error), load_context(id optional -> newest; markdown|json). Results list items with id, title, saved_at (UTC), source_tool, project_dir, 200-char preview. `contextos mcp` in cli.py; says how to install contextos[mcp] when missing. mcp>=2.3 added as optional extra and to dev; CI sets CONTEXTOS_REQUIRE_MCP=1. Stdio test: two separate server programs share one database (chat A saves, chat B loads).",
     "T-006: INSTRUCTIONS (server), SAVE_GUIDE (save_context description) and one *_HELP text per save input (Annotated Field descriptions, visible in the tool schema). Rules: use only when the user asks; write for a new agent with no memory; be specific; record failed attempts and rejected options; tell the user the id; after loading, summarize in 1-2 lines and check files before changing them. Checked only by tests on the text; not yet tried with a real agent.",
     "T-007: README rewritten for the MCP design: install from the folder with pip install -e .[mcp], use the full path of the contextos program (CONTEXTOS_PATH) in Claude Code (claude mcp add --scope user), Claude Desktop (claude_desktop_config.json mcpServers) and Cursor (~/.cursor/mcp.json). Setup steps for Claude Desktop and Cursor are written from known config formats and were NOT tried on this machine. tests/test_readme.py checks the tool table matches the real tools, every field is named, and the JSON example is valid.",
-    "T-008: cli.py adds `contextos list` (newest first, --limit/-n, --source; 80-char one-line preview), `show ID` (Markdown, --json), `delete ID` (asks y/N, --yes/-y skips; refusing exits 1). Unknown id -> error on stderr, exit 1. README 'Use it' has a short terminal example. No task after T-008 on the board yet."
+    "T-008: cli.py adds `contextos list` (newest first, --limit/-n, --source; 80-char one-line preview), `show ID` (Markdown, --json), `delete ID` (asks y/N, --yes/-y skips; refusing exits 1). Unknown id -> error on stderr, exit 1. README 'Use it' has a short terminal example. No task after T-008 on the board yet.",
+    "T-009: real-agent trial with claude -p, temp MCP config, throwaway CONTEXTOS_HOME. Save, load in another folder, file check before changing, and secret hiding all worked. Found: (1) contextos list/show crash with UnicodeEncodeError on Windows when output is redirected and text is outside cp1252 (T-008 bug, fix in cli.py); (2) user@host after :// is hidden as email. Report: outputs/trials/T-009.md. ContextOS is not registered in the user's Claude Code; context-manager and 'claude.ai Context OS' are other/old servers."
   ],
   "blockers": [],
-  "next_action": "Human reads the T-008 files. Then plan the next task (none on the board yet)."
+  "next_action": "Human reads outputs/trials/T-009.md. Proposed T-010: make contextos list/show write UTF-8 on Windows, with a test."
 }

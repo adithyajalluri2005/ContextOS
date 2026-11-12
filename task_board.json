@@ -79,5 +79,14 @@
       "python -m pytest tests"
     ],
     "status": "done"
+  },
+  {
+    "id": "T-009",
+    "goal": "Try ContextOS with a real agent: chat A saves through MCP, chat B loads and continues. Write findings to outputs/trials/T-009.md.",
+    "owner": "builder",
+    "acceptance": [
+      "python -m pytest tests"
+    ],
+    "status": "done"
   }
 ]

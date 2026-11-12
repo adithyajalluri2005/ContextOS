@@ -1,0 +1,17 @@
+{
+  "task_id": "T-009",
+  "goal": "Try ContextOS with a real agent: Claude Code chat A (claude -p) saves a context through the MCP server, a separate chat B loads it and continues. Uses a temporary MCP config and a throwaway CONTEXTOS_HOME, so the user's Claude settings and real database are not changed. Write down what worked and what did not in outputs/trials/T-009.md. Small fixes to tool instruction text are allowed if the trial shows a problem.",
+  "allowed_files": [
+    "outputs/trials/T-009.md",
+    "contextos/mcp_server.py",
+    "tests/test_mcp_server.py",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [".env", "scripts/**", "docs/**", "pyproject.toml", "contextos/store.py"],
+  "acceptance_criteria": [
+    "python -m pytest tests"
+  ],
+  "rollback_plan": "git checkout HEAD -- contextos tests; delete outputs/trials/T-009.md.",
+  "approvals_required": []
+}
