@@ -2,8 +2,10 @@
   "schema_version": 1,
   "active_task_id": null,
   "touched_files": [
+    "contextos/cli.py",
+    "tests/test_cli.py",
     "README.md",
-    "tests/test_readme.py",
+    "outputs/scope/closed/T-008.json",
     "task_board.json",
     "agent_state.json"
   ],
@@ -17,8 +19,9 @@
     "T-004: contextos/redact.py reuses the v0 rules (private key, password in URL, Anthropic/OpenAI/AWS keys, GitHub token, email, phone). redact_context(ctx) cleans every text field except id, and adds counts to any counts already on the context (cleaning twice changes nothing). New Context field `redacted`: None = not checked, {} = checked and nothing found. to_markdown() adds a 'Hidden for safety' note. The store does NOT clean by itself; the MCP save tool (T-005) must call redact_context before Store.save.",
     "T-005: contextos/mcp_server.py build_server() with tools save_context (Context -> redact_context -> Store.save; returns id, title, redacted; bad input -> ToolError, nothing saved), list_contexts(source_tool, limit 1-200), search_contexts(query; empty -> error), load_context(id optional -> newest; markdown|json). Results list items with id, title, saved_at (UTC), source_tool, project_dir, 200-char preview. `contextos mcp` in cli.py; says how to install contextos[mcp] when missing. mcp>=2.3 added as optional extra and to dev; CI sets CONTEXTOS_REQUIRE_MCP=1. Stdio test: two separate server programs share one database (chat A saves, chat B loads).",
     "T-006: INSTRUCTIONS (server), SAVE_GUIDE (save_context description) and one *_HELP text per save input (Annotated Field descriptions, visible in the tool schema). Rules: use only when the user asks; write for a new agent with no memory; be specific; record failed attempts and rejected options; tell the user the id; after loading, summarize in 1-2 lines and check files before changing them. Checked only by tests on the text; not yet tried with a real agent.",
-    "T-007: README rewritten for the MCP design: install from the folder with pip install -e .[mcp], use the full path of the contextos program (CONTEXTOS_PATH) in Claude Code (claude mcp add --scope user), Claude Desktop (claude_desktop_config.json mcpServers) and Cursor (~/.cursor/mcp.json). Setup steps for Claude Desktop and Cursor are written from known config formats and were NOT tried on this machine. tests/test_readme.py checks the tool table matches the real tools, every field is named, and the JSON example is valid."
+    "T-007: README rewritten for the MCP design: install from the folder with pip install -e .[mcp], use the full path of the contextos program (CONTEXTOS_PATH) in Claude Code (claude mcp add --scope user), Claude Desktop (claude_desktop_config.json mcpServers) and Cursor (~/.cursor/mcp.json). Setup steps for Claude Desktop and Cursor are written from known config formats and were NOT tried on this machine. tests/test_readme.py checks the tool table matches the real tools, every field is named, and the JSON example is valid.",
+    "T-008: cli.py adds `contextos list` (newest first, --limit/-n, --source; 80-char one-line preview), `show ID` (Markdown, --json), `delete ID` (asks y/N, --yes/-y skips; refusing exits 1). Unknown id -> error on stderr, exit 1. README 'Use it' has a short terminal example. No task after T-008 on the board yet."
   ],
   "blockers": [],
-  "next_action": "Human reads the T-007 files. Then T-008 (contextos list, show, delete on the command line)."
+  "next_action": "Human reads the T-008 files. Then plan the next task (none on the board yet)."
 }

@@ -1,5 +1,6 @@
-"""Tests for the `contextos` command line skeleton."""
+"""Tests for the `contextos` command line."""
 
+import json
 import subprocess
 import sys
 
@@ -7,6 +8,8 @@ from typer.testing import CliRunner
 
 from contextos import __version__
 from contextos.cli import app
+from contextos.context import Context
+from contextos.store import Store
 
 runner = CliRunner()
 
@@ -53,3 +56,78 @@ def test_mcp_command_explains_missing_package(monkeypatch):
     result = runner.invoke(app, ["mcp"])
     assert result.exit_code == 1
     assert 'pip install "contextos[mcp]"' in result.output
+
+
+# --- list, show, delete -----------------------------------------------------------
+
+
+def _save(title="Fix login bug", summary="Made-up test chat about a login bug.", **kw):
+    return Store().save(Context(title=title, summary=summary, **kw))
+
+
+def test_list_when_empty():
+    result = runner.invoke(app, ["list"])
+    assert result.exit_code == 0
+    assert "No saved contexts yet." in result.output
+
+
+def test_list_shows_newest_first_with_preview():
+    _save(title="First", summary="older one")
+    _save(title="Second", summary="x" * 200, source_tool="claude-code")
+    result = runner.invoke(app, ["list"])
+    assert result.exit_code == 0
+    assert result.output.index("Second") < result.output.index("First")
+    assert "[claude-code]" in result.output
+    assert "x" * 80 + "..." in result.output
+    assert "x" * 81 not in result.output
+
+
+def test_list_limit_and_source():
+    _save(title="Alpha", source_tool="cursor")
+    _save(title="Bravo", source_tool="claude-code")
+    _save(title="Charlie", source_tool="claude-code")
+    out = runner.invoke(app, ["list", "--limit", "1"]).output
+    assert "Charlie" in out and "Bravo" not in out and "Alpha" not in out
+    out = runner.invoke(app, ["list", "--source", "cursor"]).output
+    assert "Alpha" in out and "Bravo" not in out and "Charlie" not in out
+
+
+def test_show_markdown_and_json():
+    ctx = _save(decisions=["Use SQLite"])
+    md = runner.invoke(app, ["show", ctx.id])
+    assert md.exit_code == 0
+    assert md.output == ctx.to_markdown() + "\n"
+    js = runner.invoke(app, ["show", ctx.id, "--json"])
+    assert js.exit_code == 0
+    assert json.loads(js.output)["decisions"] == ["Use SQLite"]
+
+
+def test_show_unknown_id():
+    result = runner.invoke(app, ["show", "99"])
+    assert result.exit_code == 1
+    assert "no context with id '99'" in result.output
+
+
+def test_delete_with_yes():
+    ctx = _save()
+    result = runner.invoke(app, ["delete", ctx.id, "--yes"])
+    assert result.exit_code == 0
+    assert f"Deleted context {ctx.id}." in result.output
+    assert Store().get(ctx.id) is None
+
+
+def test_delete_asks_and_can_be_refused():
+    ctx = _save()
+    result = runner.invoke(app, ["delete", ctx.id], input="n\n")
+    assert result.exit_code == 1
+    assert "Nothing deleted." in result.output
+    assert Store().get(ctx.id) is not None
+    result = runner.invoke(app, ["delete", ctx.id], input="y\n")
+    assert result.exit_code == 0
+    assert Store().get(ctx.id) is None
+
+
+def test_delete_unknown_id():
+    result = runner.invoke(app, ["delete", "abc", "--yes"])
+    assert result.exit_code == 1
+    assert "no context with id 'abc'" in result.output

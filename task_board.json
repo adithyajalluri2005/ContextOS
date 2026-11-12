@@ -78,6 +78,6 @@
     "acceptance": [
       "python -m pytest tests"
     ],
-    "status": "todo"
+    "status": "done"
   }
 ]

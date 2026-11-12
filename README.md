@@ -114,6 +114,14 @@ The agent can use four tools:
 | `search_contexts` | Contexts that contain every word of `query`. |
 | `load_context` | One context as Markdown (or `json`). Without an `id` it loads the newest. |
 
+You can also look at your saved contexts yourself, in a terminal:
+
+```
+contextos list                 # newest first; --limit 5, --source claude-code
+contextos show 3               # one context as Markdown; add --json for JSON
+contextos delete 3             # asks first; add --yes to skip the question
+```
+
 ## What a context holds
 
 | Field | Meaning |

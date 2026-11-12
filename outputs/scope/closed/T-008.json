@@ -1,0 +1,18 @@
+{
+  "task_id": "T-008",
+  "goal": "Command-line helpers: contextos list (newest first, --limit, --source), show <id> (Markdown, --json), delete <id> (asks first, --yes to skip). Unknown id gives a clear error and exit code 1.",
+  "allowed_files": [
+    "contextos/cli.py",
+    "tests/test_cli.py",
+    "README.md",
+    "agent_state.json",
+    "task_board.json"
+  ],
+  "forbidden_files": [".env", "scripts/**", "docs/**", "pyproject.toml", "contextos/store.py", "contextos/mcp_server.py"],
+  "acceptance_criteria": [
+    "python -m pytest tests/test_cli.py",
+    "python -m pytest tests"
+  ],
+  "rollback_plan": "git checkout HEAD -- contextos/cli.py tests/test_cli.py README.md.",
+  "approvals_required": []
+}
